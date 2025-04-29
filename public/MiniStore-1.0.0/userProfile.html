@@ -1,0 +1,266 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pofile Page</title>
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Quicksand:300,400|Lato:400,300|Coda|Open+Sans);
+
+body {
+  background: #f8f5f0;
+  font-family: "Open sans", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #3498db;
+}
+
+.content-profile-page {
+  margin: 1em auto;
+  width: 100%;
+  max-width: 44.23em; 
+  padding: 0 1em;
+}
+
+.card {
+  background: #fff;
+  border-radius: 0.3rem;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  border: 0.1em solid rgba(0, 0, 0, 0.2);
+  margin-bottom: 1em;
+  padding-bottom: 2em;
+}
+
+.profile-user-page .img-user-profile {
+  margin: 0 auto;
+  text-align: center;
+  position: relative; 
+}
+
+.profile-user-page .img-user-profile .profile-bgHome {
+  width: 100%;
+  height: 16em;
+  object-fit: cover; 
+}
+
+.profile-user-page .img-user-profile .avatar {
+  margin: 0 auto;
+  background: #fff;
+  width: 10em;
+  height: 10em;
+  padding: 0.25em;
+  border-radius: 50%;
+  margin-top: -3.5em; 
+  box-shadow: 0 0 0.1em rgba(0, 0, 0, 0.35);
+}
+
+.profile-user-page .user-profile-data {
+  text-align: center;
+  padding: 0 1em;
+}
+
+.profile-user-page .user-profile-data h1 {
+  font-family: "Lato", sans-serif;
+  margin-top: 0.35em;
+  color: #292f33;
+  margin-bottom: 0;
+}
+
+.profile-user-page .user-profile-data p {
+  font-family: "Lato", sans-serif;
+  color: #8899a6;
+  font-size: 1.1em;
+  margin-top: 0.5em;
+}
+
+.profile-user-page .description-profile {
+  text-align: center;
+  color: #75787b;
+  font-size: 0.98em;
+  padding: 0 1em;
+  margin-top: 1em;
+}
+
+.profile-user-page .data-user {
+  font-family: "Quicksand", sans-serif;
+  margin-top: 1.5em; 
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap; 
+}
+
+.profile-user-page .data-user li {
+  width: 33%;
+  text-align: center;
+  border-left: 0.1em solid transparent;
+}
+
+.profile-user-page .data-user li:first-child {
+  border-left: 0;
+}
+
+.profile-user-page .data-user li a {
+  background-color: #f7f7f7;
+  padding: 0.93em 0;
+  color: #46494c;
+  display: block;
+  border-top: 1px solid rgba(242, 242, 242, 0.5);
+  border-bottom: 0.2em solid #f7f7f7;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.profile-user-page .data-user li a strong {
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.profile-user-page .data-user li a span {
+  color: #717a7e;
+}
+
+.profile-user-page .data-user li a:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-bottom: 0.2em solid #3498db;
+  color: #3498db;
+}
+
+footer h4 {
+  display: block;
+  text-align: center;
+  font-family: "Coda", sans-serif;
+  color: #566965;
+  line-height: 6;
+  font-size: 1em;
+}
+
+footer h4 a {
+  text-decoration: none;
+  color: #3498db;
+}
+
+.profile-user-page p {
+  margin: 0.5em 0; 
+  font-size: 0.9em; 
+  color: #46494c; 
+  
+}
+
+/* Specific styles for each <p> element for better control */
+#balance,
+#bankName,
+#subscriptionType,
+#cardType {
+  margin-top: 1em; /* Add top margin for separation */
+  font-weight: bold; /* Optional: Make text bold */
+  font-size: 1.2em; /* Adjust font size */
+}
+
+
+.account-items {
+  margin-top: 30px;
+  padding: 20px;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.item-card {
+  background-color: #f8f8f8;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+}
+
+.item-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+
+    </style>
+  </head>
+  <body>
+    <div class="cotnent-profile-page">
+      <div class="profile-user-page card">
+        <div class="img-user-profile">
+          <img
+            class="profile-bgHome"
+            src="https://images.pexels.com/photos/1287142/pexels-photo-1287142.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+          />
+          <img
+            class="avatar"
+            id="profilePic"
+            src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+            alt=""
+          />
+        </div>
+        <div class="user-profile-data">
+          <h1 id="name"></h1>
+          <p></p>
+        </div>
+        <div class="description-profile"><p id="description">-</p></div>
+        <ul class="data-user">
+          <li>
+            <a><strong id="items_number">-</strong></a>
+          </li>
+          <li>
+            <a><strong id="avgDays">-</strong></a>
+          </li>
+          <li>
+            <a><strong id="country">-</strong></a>
+          </li>
+        </ul>
+
+        <ul class="data-user">
+            <li>
+                <p id="balance"></p>
+            </li>
+            <li>
+                <p id="bankName"></p>
+            </li>
+            <li>
+                <p id="cardType"></p>
+            </li>
+            <li>
+                <p id="subscriptionType"></p>
+            </li>
+            <li>
+              <p ></p>
+          </li>
+          </ul>
+
+          <div class="account-items" id="accountItems">
+            <h2>Your Items</h2>
+            <div class="items-grid" id="itemsGrid"></div>
+          </div>
+          
+
+        
+       
+        
+        
+      </div>
+    </div>
+
+    <footer></footer>
+    <script src="../userProfileScript.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          loadProfile();
+        });
+      </script>
+      
+  </body>
+</html>
