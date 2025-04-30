@@ -12,7 +12,7 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(cors());
 
-
+app.use('/images', express.static(__dirname + '/images'));
 
 
 
@@ -66,8 +66,6 @@ async function connectDB() {
 
     console.log("Connected to Regions databases!");
 
-    
-
     // Handle login
     app.post("/login", async (req, res) => {
       const { username, password } = req.body;
@@ -91,9 +89,7 @@ async function connectDB() {
           if (results3.length > 0) {
             user = results3[0];
           }
-        }
-    
-
+        }   
         if (user) {
           res.json({
             message: "Login successful",
@@ -114,10 +110,6 @@ async function connectDB() {
     app.post("/signup", async (req, res) => {
 
     const { user_id, username, password, fname, lname, country } = req.body;
-
-
-
-
 
     const R1Countries = ['Nigeria', 'Kenya', 'Egypt', 'Ghana', 'South Africa', 'Ethiopia', 'Algeria', 'Morocco', 'Tunisia',
 'Uganda', 'Tanzania', 'Zambia', 'Zimbabwe', 'Senegal', 'Sudan', 'Libya', 'Angola', 'Somalia', 'Botswana', 'Namibia',
@@ -259,9 +251,6 @@ async function connectDB2() {
 
         const itemCount = itemRows[0].item_count || 0; 
     
-
-
-
         res.json({
           ...profile,
           item_count: itemCount,
@@ -281,6 +270,41 @@ async function connectDB2() {
   } catch (error) {
     console.error("Database connection failed:", error);
   }
+
+
+
+
+
+  app.get('/items',async(req, res)=> {
+    try{
+      const db = await mysql.createConnection(dbConfig_central);
+    const [items]= await db.execute(
+      
+      `select * 
+      from item_freq i
+      join item_infreq q on i.item_id=q.item_id
+      join category c on q.category_id=c.category_id
+      `
+    );
+
+    if(items.length===0){
+        return res.status(404).json({ message: 'No items to show currently' });
+    }
+
+    res.status(200).json({ items });
+  }
+  catch (error) {
+    console.error('Error fetching items:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+  });
+
+
+
+
+
+
+
 
 
 }

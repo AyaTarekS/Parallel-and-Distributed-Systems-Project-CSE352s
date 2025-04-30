@@ -115,3 +115,100 @@
     }); // End of a document ready
 
 })(jQuery);
+
+fetch('/items')
+  .then(res => res.json())
+  .then(data => {
+    const items = data.items;
+    const container = document.getElementById('products-container');
+
+    // Group items by category_id
+    const grouped = {};
+    for (const item of items) {
+      if (!grouped[item.category_id]) {
+        grouped[item.category_id] = {
+          category_name: item.main_cat_name || `Category ${item.category_id}`, 
+          items: [],
+        };
+      }
+      grouped[item.category_id].items.push(item);
+    }
+
+   
+    
+    // For each category, build a product section
+    for (const catId in grouped) {
+      const category = grouped[catId];
+      const section = document.createElement('section');
+      section.classList.add('product-section');
+
+      section.innerHTML = `
+        <div class="container">
+          <div class="row">
+            <div class="display-header d-flex justify-content-between pb-3">
+              <h2 class="display-7 text-dark text-uppercase">${category.category_name} (${category.items[0].sub_cat_name}) </h2>
+              <div class="btn-right">
+                <a href="shop.html" class="btn btn-medium btn-normal text-uppercase">Go to Shop</a>
+              </div>
+            </div>
+            <div class="swiper product-swiper">
+              <div class="swiper-wrapper">
+                ${category.items.map(item => {
+                  
+                  
+
+                  return `
+                    <div class="swiper-slide">
+                      <div class="product-card position-relative">
+                        <div class="image-holder">
+                          
+                          <img src="${item.image}" alt="${item.name}" class="img-fluid" onerror="this.onerror=null;this.src='/images/a1.JPG';">
+
+                        </div>
+                        <div class="cart-concern position-absolute">
+                          <div class="cart-button d-flex">
+                            <a href="#" class="btn btn-medium btn-black">Add to Cart</a>
+                          </div>
+                        </div>
+                        <div class="card-detail pt-3">
+                          <h3 class="card-title text-uppercase"><a href="#">${item.name}</a></h3>
+                          <span class="item-price text-primary d-block">$${item.actual_price}</span>
+                          <span class="item-price text-primary d-block">Rated: ${item.rating ? item.rating : "No Rating"}</span>
+
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+              <div class="swiper-pagination position-absolute text-center"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(section);
+    }
+
+    // Initialize Swiper for all sections
+    document.querySelectorAll('.product-swiper').forEach(swiperEl => {
+      new Swiper(swiperEl, {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        pagination: {
+          el: swiperEl.nextElementSibling,
+          clickable: true,
+        },
+        breakpoints: {
+          640: { slidesPerView: 2 },
+          768: { slidesPerView: 3 },
+          1024: { slidesPerView: 4 },
+        },
+      });
+    });
+  })
+  .catch(err => {
+    console.error('Error fetching items:', err);
+    const container = document.getElementById('products-container');
+    container.innerHTML = `<p class="text-danger">Failed to load products.</p>`;
+  });

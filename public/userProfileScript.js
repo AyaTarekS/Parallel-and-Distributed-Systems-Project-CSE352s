@@ -1,4 +1,6 @@
 async function loadProfile() {
+
+  document.getElementById('loader').style.display = 'flex';
   const user_id = localStorage.getItem('user_id'); // get saved user_id
   console.log("User ID:", user_id);
 
@@ -61,6 +63,9 @@ async function loadProfile() {
 
 
       var itemsGrid = document.getElementById('itemsGrid');
+      const sold_grid = document.getElementById('Sold');
+      const to_be_sold_grid = document.getElementById('TobeSold');
+      const purschased_grid = document.getElementById('Purschased');
       if (itemsGrid && profile.items && profile.items.length > 0) {
         profile.items.forEach(item => {
           const itemDiv = document.createElement('div');
@@ -90,11 +95,26 @@ async function loadProfile() {
 
           itemDiv.insertBefore(picc,itemDiv.firstChild);
 
-          itemsGrid.appendChild(itemDiv);
+          const type = item.type;
+          if (type === 'sold') {
+            sold_grid.appendChild(itemDiv);
+          } else if (type === 'to_be_sold') {
+            to_be_sold_grid.appendChild(itemDiv);
+          } else {
+            purschased_grid.appendChild(itemDiv);
+          }
+
+          
+
+
+
         });
         }
     }
   } catch (error) {
     console.error('Error loading profile:', error);
+  }
+  finally{
+    document.getElementById('loader').style.display = 'none'; // Hide loader
   }
 }
