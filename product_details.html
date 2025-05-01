@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products | RedStore</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <a href="index.html"><img src="images/logo.png" alt="logo" width="125px"></a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="">About</a></li>
+                    <li><a href="">Contact</a></li>
+                    <li><a href="account.html">Account</a></li>
+                </ul>
+            </nav>
+            <a href="cart.html"><img src="images/cart.png" width="30px" height="30px"></a>
+            <img src="images/menu.png" class="menu-icon" onclick="menutoggle()">
+        </div>
+    </div>
+
+    <!-- Single Products -->
+    <div class="small-container single-product">
+        <div class="row">
+            <div class="col-2">
+                <img src="" width="100%" id="ProductImg">
+            </div>
+            <div class="col-2" id="productDetails">
+                <!-- Product details will be populated here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- title -->
+    <div class="small-container">
+        <div class="row row-2">
+            <h2>Related Products</h2>
+            <p>View More</p>
+        </div>
+    </div>
+    <!-- Products -->
+    <div class="small-container">
+        <div class="row" id="related-products">
+            <!-- Related products will be populated here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="footer-col-1">
+                    <h3>Download Our App</h3>
+                    <p>Download App for Android and ios mobile phone.</p>
+                    <div class="app-logo">
+                        <img src="images/play-store.png">
+                        <img src="images/app-store.png">
+                    </div>
+                </div>
+                <div class="footer-col-2">
+                    <img src="images/logo-white.png">
+                    <p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Sports Accessible to the Many.
+                    </p>
+                </div>
+                <div class="footer-col-3">
+                    <h3>Useful Links</h3>
+                    <ul>
+                        <li>Coupons</li>
+                        <li>Blog Post</li>
+                        <li>Return Policy</li>
+                        <li>Join Affiliate</li>
+                    </ul>
+                </div>
+                <div class="footer-col-4">
+                    <h3>Follow Us</h3>
+                    <ul>
+                        <li>Facebook</li>
+                        <li>Twitter</li>
+                        <li>Instagram</li>
+                        <li>Youtube</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="copyright">Copyright 2020 - Samwit Adhikary</p>
+        </div>
+    </div>
+
+    <!-- javascript -->
+
+    <script>
+        var MenuItems = document.getElementById("MenuItems");
+        MenuItems.style.maxHeight = "0px";
+        function menutoggle() {
+            if (MenuItems.style.maxHeight == "0px") {
+                MenuItems.style.maxHeight = "200px"
+            }
+            else {
+                MenuItems.style.maxHeight = "0px"
+            }
+        }
+    </script>
+
+    <!-- product gallery -->
+    <script>
+        var ProductImg = document.getElementById("ProductImg");
+        var SmallImg = document.getElementsByClassName("small-img");
+
+        SmallImg[0].onclick = function () {
+            ProductImg.src = SmallImg[0].src;
+        }
+        SmallImg[1].onclick = function () {
+            ProductImg.src = SmallImg[1].src;
+        }
+        SmallImg[2].onclick = function () {
+            ProductImg.src = SmallImg[2].src;
+        }
+        SmallImg[3].onclick = function () {
+            ProductImg.src = SmallImg[3].src;
+        }
+
+    </script>
+
+    <script>
+        // Add this new code after existing scripts
+        async function fetchProductDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            if (!productId) {
+                console.error('No product ID provided');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/items/search?item_id=${productId}`);
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    const product = data.items[0];
+                    displayProductDetails(product);
+                } else {
+                    console.error('Product not found');
+                }
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+            }
+        }
+
+        function displayProductDetails(product) {
+            // Update page title
+            document.title = `${product.item_name} | Thunder Store`;
+
+            // Update product image
+            const productImg = document.getElementById('ProductImg');
+            productImg.src = product.image || 'images/product-1.jpg';
+
+            // Update product details
+            const detailsContainer = document.getElementById('productDetails');
+            detailsContainer.innerHTML = `
+                <p>Home / ${product.category_name}</p>
+                <h1>${product.item_name}</h1>
+                <h4>${product.discount_price ? 
+                    `$${product.discount_price} <small><s>$${product.actual_price}</s></small>` : 
+                    `$${product.actual_price}`}</h4>
+                <div class="rating">
+                    ${getStarRating(product.item_rating)}
+                    <span>(${product.item_rating ? product.item_rating.toFixed(1) : 'No'} Rating)</span>
+                </div>
+                <select>
+                    <option>Select Size</option>
+                    <option>XXL</option>
+                    <option>XL</option>
+                    <option>L</option>
+                    <option>M</option>
+                    <option>S</option>
+                </select>
+                <input type="number" value="1" min="1">
+                <a href="#" class="btn">Add To Cart</a>
+                <h3>Product Details <i class="fa fa-indent"></i></h3>
+                <br>
+                <p>Seller: ${product.seller.store_name}</p>
+                <p>Seller Rating: ${product.seller.rating ? product.seller.rating.toFixed(1) : 'No rating'}</p>
+            `;
+        }
+
+        // Load product details when page loads
+        document.addEventListener('DOMContentLoaded', fetchProductDetails);
+    </script>
+</body>
+
+</html>
