@@ -4,15 +4,14 @@
   "main": "script.js",
   "scripts": {
     "test": "npm start",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0",
     "mysql2": "^3.14.0"
   },
   "devDependencies": {

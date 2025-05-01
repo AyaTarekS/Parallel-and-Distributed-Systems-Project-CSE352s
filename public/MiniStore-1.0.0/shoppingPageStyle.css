@@ -115,53 +115,47 @@ p{
     width: 100%;
 }
 .small-container{
-    max-width: 1080px;
+    max-width: 1400px;
     margin: auto;
     padding-left: 25px;
     padding-right: 25px;
+    margin-top: -120px;
+
 }
 .col-4{
     flex-basis: 25%;
-    padding: 10px;
+    padding: 15px;
     min-width: 200px;
     margin-bottom: 50px;
-    transition: transform 0.5s;
+    transition: all 0.3s ease;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 .col-4 img{
     width: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
 }
-.title{
-    text-align: center;
-    margin: 0 auto 80px;
-    position: relative;
-    line-height: 60px;
-    color: #555;
-}
-.title::after{
-    content: '';
-    background: var(--primary-color);
-    width: 80px;
-    height: 5px;
-    border-radius: 5px;
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}
-h4{
-    color: #555;
-    font-weight: normal;
+.col-4 h4{
+    color: #333;
+    font-weight: 500;
+    font-size: 16px;
+    margin: 10px 0;
 }
 .col-4 p{
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #000;
+    margin: 8px 0;
 }
 .rating .fa{
     color: var(--primary-color);
 }
 .col-4:hover{
-    transform: translateY(-5px);
+    transform: translateY(-8px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     background: var(--background-hover);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 /* Offer */
 .offer{
@@ -657,7 +651,10 @@ form a{
 }
 
 .products-grid .row {
-    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(250px, 1fr));
+    gap: 25px;
+    padding: 20px;
 }
 
 /* Price Range Slider */
@@ -753,14 +750,6 @@ form a{
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-.range-inputs input[type="range"]:nth-child(1) {
-    z-index: 2;
-}
-
-.range-inputs input[type="range"]:nth-child(2) {
-    z-index: 1;
-}
-
 .price-values {
     display: flex;
     justify-content: space-between;
@@ -799,6 +788,31 @@ form a{
     background: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.range-inputs {
+    position: relative;
+    height: 40px;
+  }
+
+  .range-inputs input[type="range"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background:#000000;
+  pointer-events: none; /* disable default on track */
+ 
+  }
+  .range-inputs input[type="range"]::-webkit-slider-thumb {
+    pointer-events: auto; /* re-enable on thumb only */
+    z-index: 1;
+  }
+  
+/* Make sure both sliders are on top of the track */
+.range-inputs input[type="range"]:nth-child(1),
+.range-inputs input[type="range"]:nth-child(2) {
+  z-index: 100;
 }
 
 /* Adjust responsive design */
@@ -914,3 +928,32 @@ select:hover {
     color: #333;
     text-align: center;
 }
+
+
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  .spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #778186;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

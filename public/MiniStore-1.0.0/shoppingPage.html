@@ -5,17 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Products | Thunder Store</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="shoppingPageStyle.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+      </div>
     <div class="container">
         <div class="navbar">
             <div class="logo">
-                <a href="index.html"><img src="images/logo.png" alt="Thunder Store" width="125px"></a>
+                <a href="index.html"><img src="../../images/logo.JPG" alt="Thunder Store" width="170px"></a>
             </div>
             <!-- Add search form -->
             <div class="search-container">
@@ -27,13 +30,12 @@
             <nav>
                 <ul id="MenuItems">
                     <li><a href="index.html">Home</a></li>
-                    <li><a href="show_result.html">All Products</a></li>
                     <li><a href="">About</a></li>
                     <li><a href="">Contact</a></li>
-                    <li><a href="account.html">Account</a></li>
+                    <li><a href="userProfile.html">Profile</a></li>
                 </ul>
             </nav>
-            <a href="cart.html"><img src="images/cart.png" width="30px" height="30px"></a>
+            <a href="cart.html"><img src="../../images/cart.png" width="30px" height="30px"></a>
             <img src="images/menu.png" class="menu-icon" onclick="menutoggle()">
         </div>
     </div>
@@ -62,8 +64,9 @@
                 <div class="price-filter">
                     <h3>Price Range</h3>
                     <div class="range-inputs">
-                        <input type="range" id="minPrice" min="0" max="1000">
-                        <input type="range" id="maxPrice" min="0" max="1000">
+                        <input type="range" id="minPrice" min="0" max="1000" value="100">
+                        <input type="range" id="maxPrice" min="0" max="1000" value="900">
+                        
                     </div>
                     <div class="price-inputs">
                         <div class="price-input-group">
@@ -100,49 +103,56 @@
     </div>
 
     <!-- Footer -->
-    <div class="footer">
+      <div id="footer-bottom">
         <div class="container">
-            <div class="row">
-                <div class="footer-col-1">
-                    <h3>Download Our App</h3>
-                    <p>Download App for Android and ios mobile phone.</p>
-                    <div class="app-logo">
-                        <img src="images/play-store.png">
-                        <img src="images/app-store.png">
-                    </div>
+          <div class="row d-flex flex-wrap justify-content-between">
+            <div class="col-md-4 col-sm-6">
+              <div class="Shipping d-flex">
+                <p>We ship with:</p>
+                <div class="card-wrap ps-2">
+                  <img src="images/dhl.png" alt="visa">
+                  <img src="images/shippingcard.png" alt="mastercard">
                 </div>
-                <div class="footer-col-2">
-                    <img src="images/logo-white.png">
-                    <p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Sports Accessible to the Many.
-                    </p>
-                </div>
-                <div class="footer-col-3">
-                    <h3>Useful Links</h3>
-                    <ul>
-                        <li>Coupons</li>
-                        <li>Blog Post</li>
-                        <li>Return Policy</li>
-                        <li>Join Affiliate</li>
-                    </ul>
-                </div>
-                <div class="footer-col-4">
-                    <h3>Follow Us</h3>
-                    <ul>
-                        <li>Facebook</li>
-                        <li>Twitter</li>
-                        <li>Instagram</li>
-                        <li>Youtube</li>
-                    </ul>
-                </div>
+              </div>
             </div>
-            <hr>
-            <p class="copyright">Copyright 2020 - Samwit Adhikary</p>
+            <div class="col-md-4 col-sm-6">
+              <div class="payment-method d-flex">
+                <p>Payment options:</p>
+                <div class="card-wrap ps-2">
+                  <img src="images/visa.jpg" alt="visa">
+                  <img src="images/mastercard.jpg" alt="mastercard">
+                  <img src="images/paypal.jpg" alt="paypal">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+              <div class="copyright">
+                <p>© Copyright 2025 ThunderStore.</p>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
+      </div>
 
     <!-- javascript -->
 
+
     <script>
+
+function showLoadingBar() {
+    const loadingBar = document.getElementById('loadingBar');
+    loadingBar.style.width = '0%';
+    setTimeout(() => {
+        loadingBar.style.width = '100%'; // Start filling the bar
+    }, 10);
+}
+
+// Hide loading bar
+function hideLoadingBar() {
+    const loadingBar = document.getElementById('loadingBar');
+    loadingBar.style.width = '0%'; // Hide it after the fetch completes
+}
+
         var MenuItems = document.getElementById("MenuItems");
         MenuItems.style.maxHeight = "0px";
         function menutoggle() {
@@ -213,7 +223,10 @@
 
         // Modify fetchProducts to handle pagination
         async function fetchProducts(queryString = '') {
+            document.getElementById('loader').style.display = 'flex';
+
             try {
+                
                 let url = 'http://localhost:3000/items/search';
                 if (!queryString) {
                     const params = new URLSearchParams();
@@ -230,13 +243,22 @@
             } catch (error) {
                 console.error('Error fetching products:', error);
             }
+        finally {
+            document.getElementById('loader').style.display = 'none'; // Hide loader
+    }
+            
         }
 
         function displayProducts(products) {
             const container = document.getElementById('products-container');
-            container.innerHTML = products.map(product => `
-                <div class="col-4" onclick="window.location.href='product_details.html?id=${product.item_id}'">
-                    <img src="${product.image || 'images/product-1.jpg'}" alt="${product.item_name}">
+            const productDetailsPage = 'productDetailsPage.html';
+            console.log(products[0]);
+            container.innerHTML = products.map(product => 
+           
+            
+            `
+                <div class="col-4" onclick="window.location.href='${productDetailsPage}?id=${product.item_id}';">
+                    <img src="${product.image}" alt="${product.item_name}" onerror="this.onerror=null;this.src='/images/a1.JPG';">
                     <h4>${product.item_name}</h4>
                     <div class="rating">
                         ${getStarRating(product.item_rating)}
@@ -385,50 +407,49 @@
         }
 
         function setupPriceInputSync(minSlider, maxSlider, minInput, maxInput) {
-            // Sync slider to input
-            minSlider.oninput = () => {
-                const val = Math.min(minSlider.value, maxSlider.value - 1);
-                minSlider.value = val;
-                minInput.value = val;
-            };
-
-            maxSlider.oninput = () => {
-                const val = Math.max(maxSlider.value, minSlider.value + 1);
-                maxSlider.value = val;
-                maxInput.value = val;
-            };
-
-            // Sync input to slider
-            minInput.onchange = () => {
-                const val = Math.min(minInput.value, maxInput.value - 1);
-                minInput.value = val;
-                minSlider.value = val;
-            };
-
-            maxInput.onchange = () => {
-                const val = Math.max(maxInput.value, minInput.value + 1);
-                maxInput.value = val;
-                maxSlider.value = val;
-            };
+    // Slider to Input
+    minSlider.oninput = () => {
+        let minVal = Number(minSlider.value);
+        let maxVal = Number(maxSlider.value);
+        if (minVal >= maxVal) {
+            minVal = maxVal - 1;
+            minSlider.value = minVal;
         }
+        minInput.value = minVal;
+    };
 
-        // Add this new function
-        function adjustInputWidth(input) {
-            const value = input.value;
-            const length = value.length;
-            
-            // Remove all padding classes
-            input.classList.remove('price-small', 'price-medium', 'price-large');
-            
-            // Add appropriate padding class based on value length
-            if (length > 6) {
-                input.classList.add('price-large');
-            } else if (length > 4) {
-                input.classList.add('price-medium');
-            } else {
-                input.classList.add('price-small');
-            }
+    maxSlider.oninput = () => {
+        let minVal = Number(minSlider.value);
+        let maxVal = Number(maxSlider.value);
+        if (maxVal <= minVal) {
+            maxVal = minVal + 1;
+            maxSlider.value = maxVal;
         }
+        maxInput.value = maxVal;
+    };
+
+    // Input to Slider
+    minInput.onchange = () => {
+        let minVal = Number(minInput.value);
+        let maxVal = Number(maxInput.value);
+        if (minVal >= maxVal) {
+            minVal = maxVal - 1;
+            minInput.value = minVal;
+        }
+        minSlider.value = minVal;
+    };
+
+    maxInput.onchange = () => {
+        let minVal = Number(minInput.value);
+        let maxVal = Number(maxInput.value);
+        if (maxVal <= minVal) {
+            maxVal = minVal + 1;
+            maxInput.value = maxVal;
+        }
+        maxSlider.value = maxVal;
+    };
+}
+
 
         function updatePagination(pagination) {
             const { currentPage, totalPages } = pagination;
@@ -481,6 +502,34 @@
     </script>
 
     <style>
+
+
+            .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            }
+
+            .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #778186;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+            }
         .page-btn {
             display: flex;
             justify-content: center;
@@ -494,18 +543,18 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            border: 1px solid #ff523b;
+            border: 1px solid #000000;
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .page-btn span.active {
-            background: #ff523b;
+            background: #000000;
             color: white;
         }
 
         .page-btn span:hover {
-            background: #ff523b;
+            background: #343131;
             color: white;
         }
 
