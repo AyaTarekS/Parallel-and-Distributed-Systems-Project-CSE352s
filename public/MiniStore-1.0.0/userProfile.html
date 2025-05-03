@@ -273,6 +273,68 @@ footer h4 a {
   100% { transform: rotate(360deg); }
 }
 
+.transactions-section {
+  margin-top: 40px;
+  padding: 30px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.transactions-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.transactions-table {
+  overflow-x: auto;
+}
+
+.transactions-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.transactions-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.payment-logo {
+  height: 20px;
+  width: auto;
+}
+
+.status-accepted {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.9em;
+}
+
+.details-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 15px;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: background-color 0.3s;
+}
+
+.details-btn:hover {
+  background-color: #0056b3;
+}
 
     </style>
   </head>
@@ -350,12 +412,39 @@ footer h4 a {
           <h2>Purschased</h2>
           <div id="Purschased" class="items-grid"></div>
           </div>
-          
 
-        
-          
-        
-        
+          <!-- New Transaction Section -->
+          <div class="transactions-section">
+            <h2>Latest Transactions</h2>
+            <div class="transactions-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Payment Method</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>#TRX-789456</td>
+                    <td><img src="images/visa-logo.png" alt="Visa" class="payment-logo"></td>
+                    <td>$299.99</td>
+                    <td><span class="status-accepted">Accepted</span></td>
+                    <td>2024-03-20</td>
+                    <td>Invoice</td>
+                    <td><a href="transaction-details.html?id=TRX-789456" class="details-btn">Details</a></td>
+                  </tr>
+                  <!-- Add more dummy transactions here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
