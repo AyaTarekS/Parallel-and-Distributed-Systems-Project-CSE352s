@@ -611,7 +611,10 @@ async function connectDB2() {
   
 
         // Add amount to seller's account
-        
+        if ( typeof sellerAccount[0][0] === 'undefined' ){
+          console.error(`Seller doesn't have an account (Don't know how actually)`);
+          return res.status(400).json({ message: `Seller doesn't have an account (Don't know how actually)` });
+        }
         await db.query(
           `UPDATE account SET balance = balance + ? WHERE account_id = ?`,
           [itemPrice, sellerAccount[0][0].account_id]
