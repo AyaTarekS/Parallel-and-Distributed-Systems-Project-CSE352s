@@ -9,12 +9,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #000;
+            border-radius: 50%;
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: none;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .scroll-to-top:hover {
+            background: #333;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .scroll-to-top i {
+            font-size: 24px;
+            transform: translateY(-2px);
+        }
+
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .scroll-to-top:hover i {
+            animation: bounce 1s infinite;
+        }
+    </style>
 </head>
 
 <body>
     <div id="loader" class="loader-overlay">
         <div class="spinner"></div>
-      </div>
+    </div>
     <div class="container">
         <div class="navbar">
             <div class="logo">
@@ -51,7 +98,7 @@
                 <option value="rating">Sort By Rating</option>
             </select>
         </div>
-        
+
         <div class="products-with-filter">
             <!-- Category Sidebar -->
             <div class="sidebar">
@@ -66,26 +113,18 @@
                     <div class="range-inputs">
                         <input type="range" id="minPrice" min="0" max="1000" value="100">
                         <input type="range" id="maxPrice" min="0" max="1000" value="900">
-                        
+
                     </div>
                     <div class="price-inputs">
                         <div class="price-input-group">
                             <span>$</span>
-                            <input type="number" 
-                                   id="minPriceInput" 
-                                   class="price-text-input" 
-                                   placeholder="Min Price"
-                                   step="0.01"
-                                   oninput="adjustInputWidth(this)">
+                            <input type="number" id="minPriceInput" class="price-text-input" placeholder="Min Price"
+                                step="0.01" oninput="adjustInputWidth(this)">
                         </div>
                         <div class="price-input-group">
                             <span>$</span>
-                            <input type="number" 
-                                   id="maxPriceInput" 
-                                   class="price-text-input" 
-                                   placeholder="Max Price"
-                                   step="0.01"
-                                   oninput="adjustInputWidth(this)">
+                            <input type="number" id="maxPriceInput" class="price-text-input" placeholder="Max Price"
+                                step="0.01" oninput="adjustInputWidth(this)">
                         </div>
                     </div>
                     <button class="apply-price" onclick="applyPriceFilter()">Apply</button>
@@ -103,63 +142,66 @@
     </div>
 
     <!-- Footer -->
-      <div id="footer-bottom">
+    <div id="footer-bottom">
         <div class="container">
-          <div class="row d-flex flex-wrap justify-content-between">
-            <div class="col-md-4 col-sm-6">
-              <div class="Shipping d-flex">
-                <p>We ship with:</p>
-                <div class="card-wrap ps-2">
-                  <img src="images/dhl.png" alt="visa">
-                  <img src="images/shippingcard.png" alt="mastercard">
+            <div class="row d-flex flex-wrap justify-content-between">
+                <div class="col-md-4 col-sm-6">
+                    <div class="Shipping d-flex">
+                        <p>We ship with:</p>
+                        <div class="card-wrap ps-2">
+                            <img src="images/dhl.png" alt="visa">
+                            <img src="images/shippingcard.png" alt="mastercard">
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div class="col-md-4 col-sm-6">
-              <div class="payment-method d-flex">
-                <p>Payment options:</p>
-                <div class="card-wrap ps-2">
-                  <img src="images/visa.jpg" alt="visa">
-                  <img src="images/mastercard.jpg" alt="mastercard">
-                  <img src="images/paypal.jpg" alt="paypal">
+                <div class="col-md-4 col-sm-6">
+                    <div class="payment-method d-flex">
+                        <p>Payment options:</p>
+                        <div class="card-wrap ps-2">
+                            <img src="images/visa.svg" alt="visa">
+                            <img src="images/mastercard.jpg" alt="mastercard">
+                            <img src="images/paypal.jpg" alt="paypal">
+                        </div>
+                    </div>
                 </div>
-              </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="copyright">
+                        <p>© Copyright 2025 ThunderStore.</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4 col-sm-6">
-              <div class="copyright">
-                <p>© Copyright 2025 ThunderStore.</p>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
+
+    <button class="scroll-to-top" id="scrollTopBtn">
+        <i class="fas fa-chevron-up"></i>
+    </button>
 
     <!-- javascript -->
 
 
     <script>
+        function showLoadingBar() {
+            const loadingBar = document.getElementById('loadingBar');
+            loadingBar.style.width = '0%';
+            setTimeout(() => {
+                loadingBar.style.width = '100%'; // Start filling the bar
+            }, 10);
+        }
 
-function showLoadingBar() {
-    const loadingBar = document.getElementById('loadingBar');
-    loadingBar.style.width = '0%';
-    setTimeout(() => {
-        loadingBar.style.width = '100%'; // Start filling the bar
-    }, 10);
-}
-
-// Hide loading bar
-function hideLoadingBar() {
-    const loadingBar = document.getElementById('loadingBar');
-    loadingBar.style.width = '0%'; // Hide it after the fetch completes
-}
+        // Hide loading bar
+        function hideLoadingBar() {
+            const loadingBar = document.getElementById('loadingBar');
+            loadingBar.style.width = '0%'; // Hide it after the fetch completes
+        }
 
         var MenuItems = document.getElementById("MenuItems");
         MenuItems.style.maxHeight = "0px";
+
         function menutoggle() {
             if (MenuItems.style.maxHeight == "0px") {
                 MenuItems.style.maxHeight = "200px"
-            }
-            else {
+            } else {
                 MenuItems.style.maxHeight = "0px"
             }
         }
@@ -188,7 +230,7 @@ function hideLoadingBar() {
         function displayCategories(categories) {
             const container = document.getElementById('categoryList');
             if (!container) return;
-            
+
             container.innerHTML = `
                 <div class="category-item ${activeCategory === '' ? 'active' : ''}" 
                      onclick="filterByCategory('')" 
@@ -226,7 +268,7 @@ function hideLoadingBar() {
             document.getElementById('loader').style.display = 'flex';
 
             try {
-                
+
                 let url = 'http://localhost:3000/items/search';
                 if (!queryString) {
                     const params = new URLSearchParams();
@@ -235,28 +277,27 @@ function hideLoadingBar() {
                     params.append('page', currentPage);
                     queryString = '?' + params.toString();
                 }
-                
+
                 const response = await fetch(url + queryString);
                 const data = await response.json();
                 displayProducts(data.items);
                 updatePagination(data.pagination);
             } catch (error) {
                 console.error('Error fetching products:', error);
+            } finally {
+                document.getElementById('loader').style.display = 'none'; // Hide loader
             }
-        finally {
-            document.getElementById('loader').style.display = 'none'; // Hide loader
-    }
-            
+
         }
 
         function displayProducts(products) {
             const container = document.getElementById('products-container');
             const productDetailsPage = 'productDetailsPage.html';
             console.log(products[0]);
-            container.innerHTML = products.map(product => 
-           
-            
-            `
+            container.innerHTML = products.map(product =>
+
+
+                `
                 <div class="col-4" onclick="window.location.href='${productDetailsPage}?id=${product.item_id}';">
                     <img src="${product.image}" alt="${product.item_name}" onerror="this.onerror=null;this.src='/images/a1.JPG';">
                     <h4>${product.item_name}</h4>
@@ -286,7 +327,7 @@ function hideLoadingBar() {
             const select = document.getElementById('sortSelect');
             const value = select.value;
             let params = new URLSearchParams(window.location.search);
-            
+
             // Keep existing search and category filters
             if (searchTerm) {
                 params.set('name', searchTerm);
@@ -296,7 +337,7 @@ function hideLoadingBar() {
             }
 
             // Add sort parameter
-            switch(value) {
+            switch (value) {
                 case 'price_asc':
                     params.set('sort', 'price_asc');
                     break;
@@ -309,7 +350,7 @@ function hideLoadingBar() {
                 default:
                     params.delete('sort');
             }
-            
+
             await fetchProducts('?' + params.toString());
         }
 
@@ -363,12 +404,12 @@ function hideLoadingBar() {
             const minPrice = document.getElementById('minPrice').value;
             const maxPrice = document.getElementById('maxPrice').value;
             let params = new URLSearchParams();
-            
+
             if (searchTerm) params.append('name', searchTerm);
             if (activeCategory) params.append('category', activeCategory);
             params.append('min_price', minPrice);
             params.append('max_price', maxPrice);
-            
+
             await fetchProducts('?' + params.toString());
         }
 
@@ -377,7 +418,7 @@ function hideLoadingBar() {
             try {
                 const response = await fetch(`http://localhost:3000/items/price-range${category ? `?category=${category}` : ''}`);
                 const { min_price, max_price } = await response.json();
-                
+
                 const minSlider = document.getElementById('minPrice');
                 const maxSlider = document.getElementById('maxPrice');
                 const minInput = document.getElementById('minPriceInput');
@@ -392,7 +433,7 @@ function hideLoadingBar() {
                 minSlider.max = maxVal;
                 maxSlider.min = minVal;
                 maxSlider.max = maxVal;
-                
+
                 // Set initial values
                 minSlider.value = minVal;
                 maxSlider.value = maxVal;
@@ -407,55 +448,55 @@ function hideLoadingBar() {
         }
 
         function setupPriceInputSync(minSlider, maxSlider, minInput, maxInput) {
-    // Slider to Input
-    minSlider.oninput = () => {
-        let minVal = Number(minSlider.value);
-        let maxVal = Number(maxSlider.value);
-        if (minVal >= maxVal) {
-            minVal = maxVal - 1;
-            minSlider.value = minVal;
-        }
-        minInput.value = minVal;
-    };
+            // Slider to Input
+            minSlider.oninput = () => {
+                let minVal = Number(minSlider.value);
+                let maxVal = Number(maxSlider.value);
+                if (minVal >= maxVal) {
+                    minVal = maxVal - 1;
+                    minSlider.value = minVal;
+                }
+                minInput.value = minVal;
+            };
 
-    maxSlider.oninput = () => {
-        let minVal = Number(minSlider.value);
-        let maxVal = Number(maxSlider.value);
-        if (maxVal <= minVal) {
-            maxVal = minVal + 1;
-            maxSlider.value = maxVal;
-        }
-        maxInput.value = maxVal;
-    };
+            maxSlider.oninput = () => {
+                let minVal = Number(minSlider.value);
+                let maxVal = Number(maxSlider.value);
+                if (maxVal <= minVal) {
+                    maxVal = minVal + 1;
+                    maxSlider.value = maxVal;
+                }
+                maxInput.value = maxVal;
+            };
 
-    // Input to Slider
-    minInput.onchange = () => {
-        let minVal = Number(minInput.value);
-        let maxVal = Number(maxInput.value);
-        if (minVal >= maxVal) {
-            minVal = maxVal - 1;
-            minInput.value = minVal;
-        }
-        minSlider.value = minVal;
-    };
+            // Input to Slider
+            minInput.onchange = () => {
+                let minVal = Number(minInput.value);
+                let maxVal = Number(maxInput.value);
+                if (minVal >= maxVal) {
+                    minVal = maxVal - 1;
+                    minInput.value = minVal;
+                }
+                minSlider.value = minVal;
+            };
 
-    maxInput.onchange = () => {
-        let minVal = Number(minInput.value);
-        let maxVal = Number(maxInput.value);
-        if (maxVal <= minVal) {
-            maxVal = minVal + 1;
-            maxInput.value = maxVal;
+            maxInput.onchange = () => {
+                let minVal = Number(minInput.value);
+                let maxVal = Number(maxInput.value);
+                if (maxVal <= minVal) {
+                    maxVal = minVal + 1;
+                    maxInput.value = maxVal;
+                }
+                maxSlider.value = maxVal;
+            };
         }
-        maxSlider.value = maxVal;
-    };
-}
 
 
         function updatePagination(pagination) {
             const { currentPage, totalPages } = pagination;
             const container = document.getElementById('pagination');
             let html = '';
-            
+
             // Previous page
             if (currentPage > 1) {
                 html += `<span onclick="goToPage(${currentPage - 1})">←</span>`;
@@ -464,14 +505,14 @@ function hideLoadingBar() {
             // Page numbers
             for (let i = 1; i <= totalPages; i++) {
                 if (
-                    i === 1 || 
-                    i === totalPages || 
+                    i === 1 ||
+                    i === totalPages ||
                     (i >= currentPage - 2 && i <= currentPage + 2)
                 ) {
                     html += `<span class="${i === currentPage ? 'active' : ''}" 
                                   onclick="goToPage(${i})">${i}</span>`;
                 } else if (
-                    i === currentPage - 3 || 
+                    i === currentPage - 3 ||
                     i === currentPage + 3
                 ) {
                     html += `<span class="dots">...</span>`;
@@ -498,13 +539,33 @@ function hideLoadingBar() {
             fetchProducts();
             initPriceRange();
             updatePriceRange(); // Initialize price range for all categories
+
+            // Scroll to top functionality
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+            window.addEventListener('scroll', function () {
+                const scrollPosition = window.scrollY;
+                const pageHeight = document.documentElement.scrollHeight;
+                const middlePage = pageHeight / 4;
+
+                if (scrollPosition > middlePage) {
+                    scrollTopBtn.style.display = 'flex';
+                } else {
+                    scrollTopBtn.style.display = 'none';
+                }
+            });
+
+            scrollTopBtn.addEventListener('click', function () {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         });
     </script>
 
     <style>
-
-
-            .loader-overlay {
+        .loader-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -515,21 +576,27 @@ function hideLoadingBar() {
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            }
+        }
 
-            .spinner {
+        .spinner {
             border: 6px solid #f3f3f3;
             border-top: 6px solid #778186;
             border-radius: 50%;
             width: 60px;
             height: 60px;
             animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
             }
 
-            @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            100% {
+                transform: rotate(360deg);
             }
+        }
+
         .page-btn {
             display: flex;
             justify-content: center;

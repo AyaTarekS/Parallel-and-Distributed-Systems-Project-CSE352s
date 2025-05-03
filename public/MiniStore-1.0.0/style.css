@@ -1052,3 +1052,12 @@ figure.instagram-item img.insta-image {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Payment Method Logos */
+.card-wrap img,
+.payment-method img {
+  height: 30px;
+  width: auto;
+  margin-right: 10px;
+  vertical-align: middle;
+}

@@ -815,6 +815,21 @@ form a{
   z-index: 100;
 }
 
+/* Payment Method Logos */
+.card-wrap img {
+  height: 30px;
+  width: auto;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.payment-method img {
+  height: 30px;
+  width: auto;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
 /* Adjust responsive design */
 @media only screen and (max-width: 800px) {
     .products-with-filter {
