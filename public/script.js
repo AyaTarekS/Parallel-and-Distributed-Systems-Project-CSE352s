@@ -3,6 +3,7 @@
 
 document.getElementById("loginForm").addEventListener("submit", async function (e) {
     e.preventDefault();
+    localStorage.setItem('cart',JSON.stringify([]))
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
