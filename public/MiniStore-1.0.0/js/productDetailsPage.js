@@ -1,4 +1,3 @@
-
 //export let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let product = {};
 
@@ -129,7 +128,22 @@ function addToCart(){
         item: product
     });
   }
-  localStorage.setItem('cart',JSON.stringify(cart))
+  localStorage.setItem('cart',JSON.stringify(cart));
+  
+  // Show notification
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.textContent = 'Item added to cart successfully!';
+  document.body.appendChild(notification);
+  
+  // Trigger the animation
+  setTimeout(() => notification.classList.add('show'), 10);
+  
+  // Remove the notification after 3 seconds
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
 }
 
 // Load product on page load
