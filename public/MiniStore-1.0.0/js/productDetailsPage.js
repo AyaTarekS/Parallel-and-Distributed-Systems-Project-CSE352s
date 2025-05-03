@@ -55,6 +55,20 @@ function displayProductDetails(product) {
   };
   productImg.src = product.image || '../../images/a1.JPG';
 
+  let stockStatus = '';
+  let stockColor = '';
+  
+  if (product.stock_quantity === 0) {
+    stockStatus = 'Out of Stock!';
+    stockColor = 'red';
+  } else if (product.stock_quantity === 1) {
+    stockStatus = 'Only one item is left!';
+    stockColor = '#ffa500'; // yellow/orange
+  } else {
+    stockStatus = 'In Stock';
+    stockColor = 'green';
+  }
+
   const detailsContainer = document.getElementById('productDetails');
   detailsContainer.innerHTML = `
     <p>Home / ${product.category}</p>
@@ -64,17 +78,26 @@ function displayProductDetails(product) {
         ? `$${product.discount_price} <small><s>$${product.actual_price}</s></small>`
         : `$${product.actual_price}`
     }</h4>
+    <div class="stock-status" style="color: ${stockColor}; font-weight: bold; margin: 10px 0;">
+      ${stockStatus}
+    </div>
     <div class="rating">
       ${getStarRating(product.item_rating)}
       <span>(${product.item_rating ? product.item_rating.toFixed(1) : 'No'} Rating)</span>
     </div>
-    <input type="number" value="1" min="1">
-    <button class="btn">Add To Cart</button>
+    <input type="number" value="1" min="1" ${product.stock_quantity === 0 ? 'disabled' : ''} max="${product.stock_quantity}">
+    <button class="btn" ${product.stock_quantity === 0 ? 'disabled' : ''}>Add To Cart</button>
     <h3>Product Details <i class="fa fa-indent"></i></h3>
     <br>
     <p>Seller: ${product.seller.store_name}</p>
     <p>Seller Rating: ${product.seller.rating ? product.seller.rating.toFixed(1) : 'No rating'}</p>
   `;
+
+  // Add disabled button style if out of stock
+  if (product.stock_quantity === 0) {
+    document.querySelector('.btn').style.opacity = '0.5';
+    document.querySelector('.btn').style.cursor = 'not-allowed';
+  }
 }
 
 export function getStarRating(rating) {

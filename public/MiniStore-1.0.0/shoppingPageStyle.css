@@ -1000,3 +1000,17 @@ select:hover {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-3px); }
 }
+
+.stock-status {
+    font-size: 1.1em;
+    padding: 5px 10px;
+    display: inline-block;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

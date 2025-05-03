@@ -1,5 +1,3 @@
-
-
 //npm run dev
 
 const express = require("express");
@@ -359,7 +357,8 @@ async function connectDB2() {
           s.store_name,
           s.rating AS seller_rating,
           c.main_cat_name AS category_name,
-          f.image
+          f.image,
+          f.stock_quantity
         FROM item_freq f
         JOIN item_infreq i ON f.item_id = i.item_id
         JOIN category c ON i.category_id = c.category_id
@@ -401,6 +400,7 @@ async function connectDB2() {
         discount_price: row.discount_price ? parseFloat(row.discount_price) : null,
         item_rating: row.item_rating ? parseFloat(row.item_rating) : null,
         image: row.image,
+        stock_quantity: row.stock_quantity,
         seller: {
           store_name: row.store_name,
           rating: row.seller_rating ? parseFloat(row.seller_rating) : null
