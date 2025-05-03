@@ -581,7 +581,7 @@ async function connectDB2() {
             WHERE store_name = ? LIMIT 1)`,
           [item.seller_id]
         );
-        console.log(sellerAccount[0][0].account_id)
+        //console.log(sellerAccount[0][0].account_id)
         
         if (!sellerAccount.length) {
           console.error(`Seller account for item ${item.item_id} not found`);
