@@ -159,7 +159,7 @@ function removeFromCart(productId){
     })
     cart = newCart;
     localStorage.setItem('cart',JSON.stringify(cart));
-    console.log(cart);
+    //console.log(cart);
 }
 
 
@@ -216,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const cartData = JSON.parse(localStorage.getItem('cart')) || [];
       const id = JSON.parse(localStorage.getItem('user_id'));
+      //console.log(id)
       if (cartData.length === 0) {
         alert('Your cart is empty.');
         return;
@@ -235,8 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: JSON.stringify({
           order: orderDetails,
-        }),
-        userId: id
+          userId: id
+        }),     
       });
 
       const data = await response.json();
