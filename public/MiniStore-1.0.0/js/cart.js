@@ -8,106 +8,7 @@
 //console.log(deliveryDate.format('dddd, MMMM D'));
 
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
-/*
-export function renderOrderSummary(){
-	let cartSummaryHTML = '';
-	cart.forEach((matchingproduct)=>{
 
-		cartSummaryHTML+=
-				`<div class="cart-item-container js-cart-item-container-${matchingproduct.productId}">
-					
-
-					<div class="cart-item-details-grid">
-						<img class="product-image"
-							src="${matchingproduct.image}">
-
-						<div class="cart-item-details">
-							<div class="product-name">
-							${matchingproduct.item_name}
-							</div>
-							<div class="product-price">
-							${	matchingproduct.discount_price
-								  ? `$${matchingproduct.discount_price} <small><s>$${matchingproduct.actual_price}</s></small>`
-								  : `$${matchingproduct.actual_price}`
-							  }
-							</div>
-							<div class="product-quantity">
-								<span>
-									Quantity: <span class="quantity-label">${matchingproduct.quantity}</span>
-								</span>
-								<span class="update-quantity-link link-primary">
-									Update
-								</span>
-								<span class="delete-quantity-link link-primary 
-								js-delete-link" data-product-id = ${matchingproduct.productId}>
-									Delete
-								</span>
-							</div>
-						</div>
-
-						<div class="delivery-options">
-							<div class="delivery-options-title">
-								Choose a delivery option:
-							</div>
-							
-						</div>
-					</div>
-				</div>`		
-
-	});
-
-	function deliveryOptionsHTML(matchingproduct,cartitem){
-		let HTML = ``;
-		deliveryOptions.forEach((option)=>{
-			const today = dayjs();
-			const deliveryDate = today.add(option.deliveryDays, 'days');
-			const dateString = deliveryDate.format('dddd, MMMM D');
-			const price = option.priceCents === 0 ?'FREE': `$${(option.priceCents/100).toFixed(2)}`
-			const isChecked = option.id === cartitem.deliveryOptionID;
-			HTML+=`
-				<div class="delivery-option js-delivery-option"
-				data-product-id = "${matchingproduct.id}"
-				data-delivery-option = "${option.id}">
-				<input type="radio"
-					${isChecked?'checked':''}
-					class="delivery-option-input"
-					name="delivery-option-${matchingproduct.id}">
-				<div>
-					<div class="delivery-option-date">
-						${dateString}
-					</div>
-					<div class="delivery-option-price">
-						${price} - Shipping
-					</div>
-				</div>
-			</div>`
-		});
-		return HTML
-
-	}
-
-	document.querySelector(".js-order-summary").innerHTML = cartSummaryHTML;
-
-	document.querySelectorAll(".js-delete-link").forEach((link)=>{
-		link.addEventListener('click',()=>{
-			const id = link.dataset.productId;
-			removeFromCart(id);
-			document.querySelector(`.js-cart-item-container-${id}`).remove();
-
-		})
-
-	});
-
-	document.querySelectorAll(".js-delivery-option").forEach((element)=>{
-		element.addEventListener('click' , ()=>{
-			const productId = element.dataset.productId;
-			const deliveryOptionID = element.dataset.deliveryOption;
-			updateDeliveryOption(productId,deliveryOptionID);
-			renderOrderSummary()
-		});
-
-	})
-}*/
 function renderCartPage(){
 	cart = JSON.parse(localStorage.getItem('cart')) || [];
 	const cartContainer = document.querySelector('.js-cart-container');
@@ -212,6 +113,23 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const placeOrderButton = document.querySelector('.place-order-button');
 
+  const loadingBar = document.getElementById("loadingBar");
+
+  // Simulate fetching data
+  function enableLoading() {
+	loadingBar.style.display = "block";
+	placeOrderButton.disabled = true;
+
+  }
+
+  function disableLoading() {
+	loadingBar.style.display = "none";
+	  placeOrderButton.disabled = false;
+  }
+
+  
+  disableLoading();
+
   placeOrderButton.addEventListener('click', async () => {
     try {
       const cartData = JSON.parse(localStorage.getItem('cart')) || [];
@@ -229,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         seller_id: item.item.seller.store_name,
       }));
 
+	  enableLoading();
       const response = await fetch('http://localhost:3000/orders/place', {
         method: 'POST',
         headers: {
@@ -239,6 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
           userId: id
         }),     
       });
+
+	  disableLoading()
 
       const data = await response.json();
 

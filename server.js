@@ -544,7 +544,7 @@ async function connectDB2() {
       }
 
       const buyerAccountId = buyerAccountResult[0][0].account_id;
-      console.log(buyerAccountId)
+      //console.log(buyerAccountId)
 
       let totalAmount = 0;
 
@@ -581,8 +581,7 @@ async function connectDB2() {
             WHERE store_name = ? LIMIT 1)`,
           [item.seller_id]
         );
-        console.log(sellerAccount[0][0].account_id)
-        
+
         if (!sellerAccount.length) {
           console.error(`Seller account for item ${item.item_id} not found`);
           return res.status(404).json({ message: `Seller account for item ${item.item_id} not found` });
@@ -615,6 +614,7 @@ async function connectDB2() {
           console.error(`Seller doesn't have an account (Don't know how actually)`);
           return res.status(400).json({ message: `Seller doesn't have an account (Don't know how actually)` });
         }
+
         await db.query(
           `UPDATE account SET balance = balance + ? WHERE account_id = ?`,
           [itemPrice, sellerAccount[0][0].account_id]

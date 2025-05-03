@@ -98,9 +98,13 @@
                   <div class="payment-summary-money js-order-total">$0.00</div>
                 </div>
 
-                <button class="place-order-button btn btn-primary">
+                <button class="place-order-button btn btn-primary" id="placeOrderButton" disabled>
                   Place your order
                 </button>
+                <div id="loadingBar" style="display: none; text-align: center; margin-top: 10px;">
+                  <h6>Processing your order ...</h6>
+                  <img src="images/pattern-15508_512.gif" alt="Loading..." width="75px">
+                </div>
                 <div class="card-wrap ps-2">
                   <img src="images/visa.svg" alt="visa">
                   <img src="images/mastercard.jpg" alt="mastercard">
