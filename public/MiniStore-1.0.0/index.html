@@ -16,9 +16,85 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- script
     ================================================== -->
     <script src="js/modernizr.js"></script>
+    <style>
+      .scroll-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 50px;
+        height: 50px;
+        background: #000;
+        border-radius: 50%;
+        color: white;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        border: none;
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .scroll-to-top:hover {
+        background: #333;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .scroll-to-top i {
+        font-size: 24px;
+        transform: translateY(-2px);
+      }
+
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+
+      .scroll-to-top:hover i {
+        animation: bounce 1s infinite;
+      }
+
+      .user-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: #fff;
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        z-index: 1001;
+        margin-top: 10px;
+      }
+
+      .dropdown-content a {
+        color: #333;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        font-size: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .dropdown-content a:hover {
+        background-color: #f5f5f5;
+        color: #000;
+      }
+
+      .show {
+        display: block;
+      }
+    </style>
   </head>
   <body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true" tabindex="0">
     <div id="loader" class="loader-overlay">
@@ -151,12 +227,16 @@
                           </svg>
                         </a>
                       </li>
-                      <li class="pe-3">
-                        <a href="userProfile.html">
+                      <li class="pe-3 user-dropdown">
+                        <a href="#" class="profile-icon">
                           <svg class="user">
                             <use xlink:href="#user"></use>
                           </svg>
                         </a>
+                        <div class="dropdown-content" id="userDropdown">
+                          <a href="userProfile.html">Account</a>
+                          <a href="../index.html">Logout</a>
+                        </div>
                       </li>
                       <li>
                         <a href="cart.html">
@@ -588,7 +668,7 @@
             <div class="payment-method d-flex">
               <p>Payment options:</p>
               <div class="card-wrap ps-2">
-                <img src="images/visa.jpg" alt="visa">
+                <img src="images/visa.svg" alt="visa">
                 <img src="images/mastercard.jpg" alt="mastercard">
                 <img src="images/paypal.jpg" alt="paypal">
               </div>
@@ -602,10 +682,56 @@
         </div>
       </div>
     </div>
+    <button class="scroll-to-top" id="scrollTopBtn">
+      <i class="fas fa-chevron-up"></i>
+    </button>
     <script src="js/jquery-1.11.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="js/plugins.js"></script>
     <script type="text/javascript" src="js/script.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Scroll to top functionality
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+        
+        window.addEventListener('scroll', function() {
+          const scrollPosition = window.scrollY;
+          const pageHeight = document.documentElement.scrollHeight;
+          const middlePage = pageHeight / 4;
+          
+          if (scrollPosition > middlePage) {
+            scrollTopBtn.style.display = 'flex';
+          } else {
+            scrollTopBtn.style.display = 'none';
+          }
+        });
+        
+        scrollTopBtn.addEventListener('click', function() {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        });
+
+        // Add dropdown functionality
+        const profileIcon = document.querySelector('.profile-icon');
+        const dropdown = document.getElementById('userDropdown');
+        
+        profileIcon.addEventListener('click', function(e) {
+          e.preventDefault();
+          dropdown.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+          if (!e.target.matches('.profile-icon') && !e.target.matches('.user')) {
+            if (dropdown.classList.contains('show')) {
+              dropdown.classList.remove('show');
+            }
+          }
+        });
+      });
+    </script>
   </body>
 </html>
