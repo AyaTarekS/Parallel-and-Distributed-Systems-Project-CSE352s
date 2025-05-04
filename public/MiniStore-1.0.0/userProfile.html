@@ -94,36 +94,40 @@ a {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap; 
+  gap: 1em; /* Optional spacing between items */
 }
 
 .profile-user-page .data-user li {
-  width: 33%;
+  flex: 1 1 30%;
   text-align: center;
-  border-left: 0.1em solid transparent;
-}
-
-.profile-user-page .data-user li:first-child {
-  border-left: 0;
+  min-width: 50px;
 }
 
 .profile-user-page .data-user li a {
   background-color: #f7f7f7;
-  padding: 0.93em 0;
+  padding: 1em;
   color: #46494c;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 40px; /* Force uniform height */
   border-top: 1px solid rgba(242, 242, 242, 0.5);
   border-bottom: 0.2em solid #f7f7f7;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 1px 1px rgba(255, 255, 255, 0.4);
+              0 1px 1px rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
 }
 
 .profile-user-page .data-user li a strong {
   font-size: 2em;
   font-weight: 600;
+  margin-bottom: 0.2em;
 }
 
 .profile-user-page .data-user li a span {
   color: #717a7e;
+  font-size: 2em;
 }
 
 .profile-user-page .data-user li a:hover {
