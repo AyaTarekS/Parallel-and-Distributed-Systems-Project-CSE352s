@@ -66,20 +66,38 @@ function removeFromCart(productId){
 
 function updateOrderSummary() {
   const cartData = cart;
-  const shippingCost = 4.99;  
-  const taxRate = 0.1;
-  
+  const shippingCost = 4.99;
+  if(cartData.length === 0){
+	shippingCost = 0;
+	}
   const totalItems = cartData.reduce((sum, item) => sum + item.quantity, 0);
   const itemsTotal = cartData.reduce((sum, item) => sum + (item.item.discount_price || item.item.actual_price) * item.quantity, 0);
   const subtotal = itemsTotal + shippingCost;
-  const tax = subtotal * taxRate;
-  const orderTotal = subtotal + tax;
+
+  let totalTax = 0;
+  const taxDetails = cartData.map(item => {
+    const itemPrice = (item.item.discount_price || item.item.actual_price) * item.quantity;
+    const itemTax = itemPrice * (item.item.tax_rate / 100 || 0);
+    totalTax += itemTax;
+    return `
+      <div class = "tax-item-container" >
+        <li class ="tax-item">${item.item.item_name} </li>
+        <span class = "tax-info">(${item.item.tax_rate}%)→$${itemTax.toFixed(2)}</span>
+      </div>`;
+  }).join("");
+
+  const orderTotal = subtotal + totalTax;
 
   document.querySelector('.js-total-items').textContent = totalItems;
   document.querySelector('.js-items-total').textContent = `$${itemsTotal.toFixed(2)}`;
   document.querySelector('.js-shipping').textContent = `$${shippingCost.toFixed(2)}`;
   document.querySelector('.js-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-  document.querySelector('.js-tax').textContent = `$${tax.toFixed(2)}`;
+  document.querySelector('.js-tax').innerHTML = `${taxDetails}`;
+  document.querySelector('.total-tax').innerHTML = `<span>$${totalTax.toFixed(2)}</span>`
+  
+  
+
+
   document.querySelector('.js-order-total').textContent = `$${orderTotal.toFixed(2)}`;
 }
 
@@ -145,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quantity: item.quantity,
         price_at_purchase: item.item.discount_price || item.item.actual_price,
         seller_id: item.item.seller.store_name,
+		tax_rate: item.item.tax_rate
       }));
 
 	  enableLoading();
@@ -165,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok) {
         alert('Order placed successfully!');
-        localStorage.removeItem('cart');
+		localStorage.setItem('cart' , JSON.stringify([]))
         window.location.reload();
       } else {
         alert(`Error placing order: ${data.message}`);

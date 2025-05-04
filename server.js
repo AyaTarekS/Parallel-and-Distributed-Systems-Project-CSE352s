@@ -136,226 +136,43 @@ async function connectDB() {
     });
 
 
-// Handle signup
+
+    // Handle signup
     app.post("/signup", async (req, res) => {
-      const {
-        user_id, username, password,
-        fname, minit, lname, country,
-        phone_num, gender, date_birth
-      } = req.body;
-    
-      if (!user_id || !username || !password || !fname || !lname || !country || !gender || !date_birth) {
-        return res.status(400).json({ message: "All required fields must be filled" });
+
+    const { user_id, username, password, fname, lname, country } = req.body;
+
+let dbToUse;
+//let currentDB; 
+
+if (R1Countries.includes(country)) {
+  dbToUse = db1;
+  //currentDB = 'db1'
+} else if (R2Countries.includes(country)) {
+  dbToUse = db2;
+  //currentDB = 'db2'
+} else if (R3Countries.includes(country)) {
+  dbToUse = db3;
+  //currentDB = 'db3'
+} else {
+  return res.json({ message: "Country not supported for our system."});
+}
+    //localStorage.setItem('currentDB' , JSON.stringify(currentDB));
+
+      if (!/^\d{9}$/.test(user_id)) {
+        return res.json({ message: "User ID must be a 9-digit number." });
       }
-    
-      if (user_id < 100000000 || user_id > 999999999) {
-        return res.status(400).json({ message: "User ID must be a 9-digit number" });
-      }
 
- let dbToUse;
+      const query = "INSERT INTO user (user_id, username, password, email_verified) VALUES (?, ?, ?, 1)";
 
-  if (R1Countries.includes(country)) {
-    dbToUse = db1;
-  } else if (R2Countries.includes(country)) {
-    dbToUse = db2;
-  } else if (R3Countries.includes(country)) {
-    dbToUse = db3;
-  } else {
-    return res.status(400).json({ message: "Country not supported for our system." });
-  }
-
-  let centralDb;
-
-  try {
-    await dbToUse.beginTransaction();
-    centralDb = await mysql.createConnection(dbConfig_central);
-    await centralDb.beginTransaction();
-
-    await dbToUse.execute(
-      "INSERT INTO user (user_id, username, password, email_verified) VALUES (?, ?, ?, 1)",
-      [user_id, username, password]
-    );
-
-    await centralDb.execute(
-      `INSERT INTO person_IdentityInfo (person_id, fname, minit, lname, phone_num, address, country)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [user_id, fname, minit || null, lname, phone_num || null, null, country]
-    );
-
-    await centralDb.execute(
-      `INSERT INTO person_ProfileInfo (person_id, gender, date_birth)
-       VALUES (?, ?, ?)`,
-      [user_id, gender, date_birth]
-    );
-
-    // Commit both transactions
-    await dbToUse.commit();
-    await centralDb.commit();
-
-    return res.status(201).json({
-      success: true,
-      message: "User created successfully!",
-      user_id: user_id
-    });
-
-  } catch (error) {
-    console.error("Signup error:", error);
-
-    // Rollback if any error
-    if (dbToUse) await dbToUse.rollback();
-    if (centralDb) await centralDb.rollback();
-
-    // Handle duplicate user
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({
-        success: false,
-        message: "Signup failed. User ID or username may already exist."
-      });
-    }
-
-    return res.status(500).json({
-      success: false,
-      message: "Signup failed. Please try again.",
-      error: error.message
-    });
-  }
-});
-
-  app.post('/deposit', async (req, res) => {
-    const { user_id, amount } = req.body;
-    
-    try {
-      const db = await mysql.createConnection(dbConfig_central);
-      // Update balance
-      const [result] = await db.execute(
-        `UPDATE account SET balance = balance + ? WHERE person_id = ?`,
-        [amount, user_id]
-      );
-      
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ success: false, message: 'Account not found' });
-      }
-      
-      res.json({ success: true, message: 'Funds added successfully' });
-    } catch (error) {
-      console.error('Error depositing funds:', error);
-      res.status(500).json({ success: false, message: 'Error depositing funds' });
-    }
-  });
-
-  const multer = require('multer');
-  const path = require('path');
-  
-  // Configure file storage
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'public/uploads/');
-    },
-    filename: (req, file, cb) => {
-      cb(null, `profile-${Date.now()}${path.extname(file.originalname)}`);
-    }
-  });
-  
-  const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
-  });
-  
-  app.post('/createAccount', upload.single('profile_picture'), async (req, res) => {
-    console.log('Request Body:', req.body);
-    console.log('Uploaded File:', req.file);
-  
-    try {
-      // Validate required fields
-      const requiredFields = [
-        'person_id', 'bank_name', 'card_num', 
-        'card_type', 'passcode', 'subscription_type',
-        'expiry_month', 'expiry_year'
-      ];
-      
-      const missingFields = requiredFields.filter(field => !req.body[field]);
-      if (missingFields.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: `Missing required fields: ${missingFields.join(', ')}`
-        });
-      }
-  
-      // Format data
-      const accountData = {
-        account_id: `ACC${Math.floor(100000000000 + Math.random() * 900000000000)}`,
-        person_id: req.body.person_id,
-        bank_name: req.body.bank_name,
-        card_num: req.body.card_num.replace(/\s+/g, ''),
-        card_type: req.body.card_type,
-        passcode: req.body.passcode,
-        subscription_type: req.body.subscription_type,
-        expiry_date: `${req.body.expiry_year}-${req.body.expiry_month.padStart(2, '0')}-01`,
-        profile_picture: req.file ? `/uploads/${req.file.filename}` : null
-      };
-  
-      console.log('Processed Account Data:', accountData);
-  
-      // Database operation
-      const db = await mysql.createConnection(dbConfig_central);
-      
       try {
-        await db.beginTransaction();
-  
-        // Check if user exists
-        const [user] = await db.execute(
-          'SELECT 1 FROM person_IdentityInfo WHERE person_id = ?', 
-          [accountData.person_id]
-        );
-        
-        if (user.length === 0) {
-          throw new Error('User does not exist');
-        }
-  
-        // Insert account
-        await db.execute(
-          `INSERT INTO account (
-            account_id, person_id, bank_name, card_num, 
-            card_type, passcode, subscription_type, 
-            expiry_date, profile_picture, balance
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00)`,
-          Object.values(accountData)
-        );
-  
-        await db.commit();
-        
-        return res.json({ 
-          success: true, 
-          message: 'Account created successfully',
-          account_id: accountData.account_id
-        });
-  
-      } catch (dbError) {
-        await db.rollback();
-        console.error('Database Error:', dbError);
-        
-        // Handle specific error codes
-        if (dbError.code === 'ER_DUP_ENTRY') {
-          throw new Error('Account already exists for this user');
-        }
-        if (dbError.code === 'ER_NO_REFERENCED_ROW_2') {
-          throw new Error('User does not exist in our system');
-        }
-        throw dbError;
-      } finally {
-        await db.end();
+        const [result] = await dbToUse.execute(query, [user_id, username, password]);
+        res.json({ message: "Account created successfully!" });
+      } catch (err) {
+        console.error(err);
+        res.json({ message: "Signup failed. User ID or username may already exist." });
       }
-  
-    } catch (error) {
-      console.error('Account Creation Error:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: error.message || 'Account creation failed',
-        error: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      });
-    }
-  });
-
+    });
 
 
   } catch (error) {
@@ -536,6 +353,7 @@ async function connectDB2() {
           f.name AS item_name,
           f.actual_price,
           i.discount_price,
+          i.tax_rate,
           f.rating AS item_rating,
           s.store_name,
           s.rating AS seller_rating,
@@ -581,6 +399,7 @@ async function connectDB2() {
         category: row.category_name,
         actual_price: parseFloat(row.actual_price),
         discount_price: row.discount_price ? parseFloat(row.discount_price) : null,
+        tax_rate: row.tax_rate ? parseFloat(row.tax_rate) : null,
         item_rating: row.item_rating ? parseFloat(row.item_rating) : null,
         image: row.image,
         stock_quantity: row.stock_quantity,
@@ -730,6 +549,7 @@ async function connectDB2() {
       //console.log(buyerAccountId)
 
       let totalAmount = 0;
+      let totalTax = 0;
 
       let tempTotalAmount = 0;
       for (const item of req.body.order){
@@ -765,13 +585,17 @@ async function connectDB2() {
           [item.seller_id]
         );
 
-        if (!sellerAccount.length) {
-          console.error(`Seller account for item ${item.item_id} not found`);
-          return res.status(404).json({ message: `Seller account for item ${item.item_id} not found` });
+        if ( typeof sellerAccount[0][0] === 'undefined' ){
+          console.error(`Seller doesn't have an account (Don't know how actually)`);
+          return res.status(400).json({ message: `Seller doesn't have an account (Don't know how actually)` });
         }
   
         const itemPrice = item.price_at_purchase * item.quantity;
         totalAmount += itemPrice;
+
+        const itemTax = itemPrice * (item.tax_rate / 100 || 0);
+        totalTax += itemTax;
+        console.log(item)
   
         // Deduct stock quantity
         if (product[0].stock_quantity < item.quantity) {
@@ -793,37 +617,70 @@ async function connectDB2() {
   
 
         // Add amount to seller's account
-        if ( typeof sellerAccount[0][0] === 'undefined' ){
-          console.error(`Seller doesn't have an account (Don't know how actually)`);
-          return res.status(400).json({ message: `Seller doesn't have an account (Don't know how actually)` });
-        }
+        
+
+        const sellerAccountID = sellerAccount[0][0].account_id;
 
         await db.query(
           `UPDATE account SET balance = balance + ? WHERE account_id = ?`,
-          [itemPrice, sellerAccount[0][0].account_id]
+          [itemPrice, sellerAccountID]
         );
   
         // Record transaction for seller
         let transactionId = 'TRANS' + Math.floor(Math.random() * 100000);
         await db.query(
           `INSERT INTO transaction (transaction_id, transaction_type, transaction_date, amount, account_id) VALUES (?,?, ?, ?, ?)`,
-          [transactionId, 'Customer Payment recived', new Date(), itemPrice, sellerAccount[0][0].account_id]
+          [transactionId, 'Customer Payment recived', new Date(), itemPrice, sellerAccountID]
         );
   
         // Record transfer of ownership in `transfer` table
         await db.query(
           `INSERT INTO transfer (fromaccountid, toaccountid, Type) VALUES (?, ?, ?)`,
-          [sellerAccount[0][0].account_id, buyerAccountId, 'item']
+          [sellerAccountID, buyerAccountId, 'item']
         );
         await db.query(
           `INSERT INTO transfer (fromaccountid, toaccountid, Type) VALUES (?, ?, ?)`,
-          [buyerAccountId, sellerAccount[0][0].account_id, 'money']
+          [buyerAccountId, sellerAccountID, 'money']
         );
+
+        ///// 'have' table handling
+        const [check_seller] = await db.query(
+          `SELECT * FROM have WHERE item_id = ? AND account_id = ?`,
+          [item.item_id , sellerAccountID]
+        );
+        
+        if (check_seller.length > 0) {
+          await db.query(
+            `UPDATE have SET type = ? WHERE item_id = ? AND account_id = ?`,
+            ['sold' ,item.item_id, sellerAccountID]
+          );
+          //console.log("Item updated.");
+        } else {
+          await db.query(
+            `INSERT INTO have (account_id , item_id , type) VALUES (?, ?, ?)`,
+            [sellerAccountID, item.item_id, 'sold']
+          );
+          //console.log("Item does not exist. Insertion done for seller successfully.");
+        }
+
+        const [check_buyer] = await db.query(
+          `SELECT * FROM have WHERE item_id = ? AND account_id = ?`,
+          [item.item_id , buyerAccountId]
+        );
+        
+        if (!(check_buyer.length > 0)) {
+          await db.query(
+            `INSERT INTO have (account_id , item_id , type) VALUES (?, ?, ?)`,
+            [buyerAccountId, item.item_id, 'purchased']
+          );
+          //console.log("Insertion done for buyer successfully");
+        }
+
       }
 
       const orderTime = new Date();
       const shippingLocation = user_country; // Assuming shipping location is the user's country
-      const status = 'pending'; // Default status for a new order
+      const orderstatus = 'pending'; // Default status for a new order
       const trackingNumber = Math.floor(10000 + Math.random() * 90000).toString(); // Generate a random tracking number
       const deliveryMethod = 'Road Freight'; // Default delivery method
       const packageType = 'box'; // Default package type
@@ -833,11 +690,27 @@ async function connectDB2() {
       const newOrderResult = await db2.query(
         `INSERT INTO orders (user_id, total_amount, shipping_location, order_time, status, tracking_number, delivery_method, package_type, order_priority, expected_delivery_time) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [req.body.userId, totalAmount, shippingLocation, orderTime, status, trackingNumber, deliveryMethod, packageType, orderPriority, expectedDeliveryTime]
+        [req.body.userId, totalAmount, shippingLocation, orderTime, orderstatus, trackingNumber, deliveryMethod, packageType, orderPriority, expectedDeliveryTime]
       );
+
       const newOrderId = newOrderResult[0].insertId;
-      //console.log(newOrderId)
+
+      //// add payment
       
+      const paymentMethods = ["Bank_Transfer", "Paypal", "Credit_Card", "Cash"];
+      const paymentMethod = paymentMethods[Math.floor(Math.random() * paymentMethods.length)];
+      const paymentstatus = 'completed';
+      
+      const newPaymentResult = await db2.query(
+        `INSERT INTO payment (user_id, order_id, amount_without_taxes, status, payment_date, method, tax_amount) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [req.body.userId, newOrderId, totalAmount, paymentstatus, new Date(), paymentMethod, totalTax]
+      );
+
+      const newPaymentId = newPaymentResult[0].insertId;
+      
+      
+
       // Deduct total amount from buyer's account
       const buyerAccount = await db.query(`SELECT * FROM account WHERE account_id = ?`, [buyerAccountId]);
       if (buyerAccount[0].balance < totalAmount) {
@@ -856,7 +729,7 @@ async function connectDB2() {
         [transactionId,'Invoice', new Date(), totalAmount, buyerAccountId]
       );
 
-      // Record order in `contains` table
+      // Record order in `contains` table--
 
       await db.query(
         `INSERT INTO contains (order_id, item_id, quantity, price_at_purchase) VALUES ?`,
@@ -864,7 +737,7 @@ async function connectDB2() {
       );
   
       res.status(200).json({ message: 'Order placed successfully' });
-     
+      await db.end();
     } catch (error) {
       console.error('Error in placeOrder:', error); // Log the error for debugging
       res.status(500).json({ message: 'Internal server error', error: error.message });

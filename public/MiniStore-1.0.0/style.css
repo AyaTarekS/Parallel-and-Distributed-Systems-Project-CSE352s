@@ -1061,3 +1061,24 @@ figure.instagram-item img.insta-image {
   margin-right: 10px;
   vertical-align: middle;
 }
+
+.tax-item {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px; /* Adjust as needed */
+  margin-right: 5px;
+
+ 
+}
+
+.tax-item-container{
+  display: flex; 
+  justify-content: space-between; 
+  margin-bottom: 5px;
+  list-style-type: disc;
+  padding-left: 10px;
+}
+
+
+

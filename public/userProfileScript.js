@@ -13,12 +13,7 @@ async function loadProfile() {
   try {
     const response = await fetch(`/profileInfo?user_id=${user_id}`);
     const profile = await response.json();
-    
-    if (profile.message === 'Account info not found for this user') {
-      // Redirect to create account page if no account exists
-      window.location.href = 'createAccount.html';
-      return;
-    }
+    console.log("Profile:", profile);
 
     if (profile.message) {
       alert(profile.message);
@@ -121,34 +116,5 @@ async function loadProfile() {
   }
   finally{
     document.getElementById('loader').style.display = 'none'; // Hide loader
-  }
-}
-
-async function addFunds() {
-  const user_id = localStorage.getItem('user_id');
-  const amount = document.getElementById('fundAmount').value;
-  
-  if (!amount || isNaN(amount)) {
-    alert('Please enter a valid amount');
-    return;
-  }
-
-  try {
-    const response = await fetch('/deposit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id, amount: parseFloat(amount) })
-    });
-    
-    const result = await response.json();
-    if (result.success) {
-      alert('Funds added successfully!');
-      loadProfile(); // Refresh the profile to show updated balance
-    } else {
-      alert(result.message || 'Error adding funds');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error adding funds');
   }
 }
