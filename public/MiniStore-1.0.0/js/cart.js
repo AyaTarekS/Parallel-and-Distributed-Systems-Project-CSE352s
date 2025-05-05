@@ -66,7 +66,7 @@ function removeFromCart(productId){
 
 function updateOrderSummary() {
   const cartData = cart;
-  const shippingCost = 4.99;
+  let shippingCost = 4.99;
   if(cartData.length === 0){
 	shippingCost = 0;
 	}

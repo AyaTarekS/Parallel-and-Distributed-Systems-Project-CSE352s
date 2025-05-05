@@ -491,7 +491,7 @@ footer h4 a {
 
           <!-- New Transaction Section -->
           <div class="transactions-section">
-            <h2>Latest Transactions</h2>
+            
             <div class="transactions-table">
               <table>
                 <thead>
@@ -532,33 +532,7 @@ footer h4 a {
 
     <footer></footer>
     <script src="../userProfileScript.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          loadProfile();
-          
-          // Scroll to top functionality
-          const scrollTopBtn = document.getElementById('scrollTopBtn');
-          
-          window.addEventListener('scroll', function() {
-            const scrollPosition = window.scrollY;
-            const pageHeight = document.documentElement.scrollHeight;
-            const middlePage = pageHeight / 4;
-            
-            if (scrollPosition > middlePage) {
-              scrollTopBtn.style.display = 'flex';
-            } else {
-              scrollTopBtn.style.display = 'none';
-            }
-          });
-          
-          scrollTopBtn.addEventListener('click', function() {
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
-          });
-        });
-      </script>
+    <script src = "js/userProfile.js"> </script>
       
   </body>
 </html>

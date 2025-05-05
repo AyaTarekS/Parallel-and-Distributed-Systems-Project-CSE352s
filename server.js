@@ -85,7 +85,7 @@ const dbConfig3 = {
   port: "41908"
 };
 
-
+let dbConfig;
 
 async function connectDB() {
   try {
@@ -506,10 +506,170 @@ async function connectDB2() {
     }
   });
 
+  /////Transactions
+  app.get('/transactions', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {user_id} = req.query;
+
+      const buyerAccountResult = await db.query(
+        `SELECT account_id FROM account WHERE person_id = ?`,
+        [user_id]
+      );
+      //console.log(buyerAccountResult[0][0].account_id)
+      const results = await db.query(
+        `SELECT * FROM railway.transaction where account_id = ?`,
+        [buyerAccountResult[0][0].account_id]
+      );
+      //console.log(results)
+      res.json(results);
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/transactions/byId', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {transactionId} = req.query;
+
+      const transactionResult = await db.query(
+        `SELECT * FROM railway.transaction where transaction_id = ?`,
+        [transactionId]
+      );
+      //console.log(transactionResult[0][0])
+      res.json(transactionResult[0][0]);
+
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /////buyeraccount
+  app.get('/buyerAccount', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {user_id} = req.query;
+
+      const buyerAccountInfoResult = await db.query(
+        `SELECT * FROM person_IdentityInfo WHERE person_id = ?`,
+        [user_id]
+      );
+      //console.log(buyerAccountInfoResult[0][0])
+      
+      res.json(buyerAccountInfoResult[0][0]);
+
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+  
+
+  /////productsDetails
+  app.get('/productsDetails', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {user_id} = req.query;
+
+      const userCountryResult = await db.query(
+        `SELECT country FROM person_IdentityInfo WHERE person_id = ?`,
+        [user_id]
+      );
+  
+      if (!userCountryResult.length) {
+        console.error('User not found for user_id:', req.user.id);
+        return res.status(404).json({ message: 'User not found' });
+      }
+      let user_country = userCountryResult[0][0].country;
+      //console.log(user_country)
+  
+      if (R1Countries.includes(user_country)) {
+        dbConfig = dbConfig1;
+      } else if (R2Countries.includes(user_country)) {
+        dbConfig = dbConfig2;
+      } else if (R3Countries.includes(user_country)) {
+        dbConfig = dbConfig3;
+      }
+      const db2 = await mysql.createConnection(dbConfig); 
+
+
+      const productsDetailsInfoResult = await db2.query(
+        `SELECT * FROM orders where user_id = ?`,
+        [user_id]
+      );
+      //console.log(productsDetailsInfoResult[0])
+      
+      res.json(productsDetailsInfoResult[0]);
+
+      await db.end();
+      await db2.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  ///ordercontents
+  app.get('/orderContents', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {order_id} = req.query;
+
+      const orderContentsResult = await db.query(
+        `SELECT i.name,	
+		            i.image,
+                c.price_at_purchase,
+                c.quantity,
+                s.store_name  
+		     FROM railway.contains c
+         join railway.item_freq i on i.item_id = c.item_id
+         join railway.item_infreq f on i.item_id = f.item_id
+         join railway.seller s on s.seller_id = f.seller_id
+         where order_id = ?`,
+        [order_id]
+      );
+      res.json(orderContentsResult[0]);
+      
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+  ///paymentInfo
+  app.get('/paymentInfo', async (req, res) => {
+    try {
+      const db2 = await mysql.createConnection(dbConfig); 
+      const {order_id} = req.query;
+
+      const paymentInfoResult = await db2.query(
+        `SELECT * FROM region_3.payment where order_id = ?`,
+        [order_id]
+      );
+      res.json(paymentInfoResult[0]);
+      
+      await db2.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+
+
+  
+
+
   /////
   app.post('/orders/place', async (req, res) => {
     const db = await mysql.createConnection(dbConfig_central);
-    let dbConfig;
+    
     
     const userCountryResult = await db.query(
       `SELECT country FROM person_IdentityInfo WHERE person_id = ?`,
