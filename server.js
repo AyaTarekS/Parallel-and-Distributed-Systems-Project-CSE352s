@@ -771,9 +771,123 @@ async function connectDB2() {
     }
   });
   
+  app.post('/items/create', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const { 
+        itemName, 
+        imageUrl, 
+        price, 
+        discount, 
+        stockQuantity,
+        warranty,
+        category,
+        taxRate,
+        sellerId 
+      } = req.body;
+
+      // Validate numeric inputs
+      const actualPrice = Math.max(0, parseFloat(price));
+      const validatedTaxRate = taxRate ? Math.max(0, Math.min(100, parseFloat(taxRate))) : 0;
+      const validatedDiscount = discount ? Math.max(0, Math.min(100, parseFloat(discount))) : 0;
+      const discountPrice = validatedDiscount > 0 ? 
+        parseFloat((actualPrice * (1 - validatedDiscount/100)).toFixed(2)) : null;
+      const validatedWarranty = warranty ? parseInt(warranty) : 0;
+
+      // Get category_id using sub_cat_name
+      const [categoryResult] = await db.query(
+        'SELECT category_id FROM category WHERE sub_cat_name = ?',
+        [category]
+      );
+
+      if (!categoryResult.length) {
+        return res.status(400).json({ 
+          message: 'Invalid category',
+          error: 'INVALID_CATEGORY'
+        });
+      }
+
+      const categoryId = categoryResult[0].category_id;
+
+      // Insert into item_freq with transaction
+      let result
+      await db.beginTransaction();
+      try {
+         result = await db.query(
+          `INSERT INTO item_freq (stock_quantity, actual_price, name, image, rating, num_ratings)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [stockQuantity, actualPrice, itemName, imageUrl, 0, 0]
+        )
+        console.log(result)
+        const insertedItemId = result[0].insertId;
+
+      // Insert into item_infreq with all fields explicitly specified
+      await db.query(
+        `INSERT INTO item_infreq (item_id, is_best_seller, tax_rate, warranty_period, link, discount_price, category_id, seller_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          insertedItemId,
+          0, 
+          validatedTaxRate || 0,
+          validatedWarranty,
+          null, 
+          discountPrice,
+          categoryId,
+          sellerId
+        ]
+      );
+
+        
+
+        const [sellerAccount] = await db.query(
+          'SELECT account_id FROM account WHERE person_id = ?',
+          [sellerId]
+        );
+
+        await db.query(
+          `INSERT INTO have (account_id, item_id, type)
+           VALUES (?, ?, ?)`,
+          [sellerAccount[0].account_id, insertedItemId, 'to_be_sold']
+        );
+
+        await db.commit();
+        res.json({ 
+          message: 'Listing created successfully',
+          itemId: insertedItemId 
+        });
+      } catch (err) {
+        await db.rollback();
+        throw err;
+      }
+
+    } catch (error) {
+      console.error('Error creating listing:', error);
+      res.status(500).json({ 
+        message: 'Failed to create listing',
+        error: error.message 
+      });
+    }
+  });
+
+  // Helper function to get next available item_id
+  async function getNextItemId(db) {
+    const [maxIdResult] = await db.query('SELECT MAX(item_id) as maxId FROM item_freq');
+    return (maxIdResult[0].maxId || 0) + 1;
+  }
+  
+  app.get('/categories/list', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const [categories] = await db.query(
+        'SELECT sub_cat_name FROM category ORDER BY sub_cat_name'
+      );
+      res.json(categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      res.status(500).json({ message: 'Failed to fetch categories' });
+    }
+  });
 }
-
-
 
 async function startServer() {
   try {
