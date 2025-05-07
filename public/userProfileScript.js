@@ -13,7 +13,8 @@ async function loadProfile() {
   try {
     const response = await fetch(`/profileInfo?user_id=${user_id}`);
     const profile = await response.json();
-    
+    console.log("Profile:", profile);
+
     if (profile.message === 'Account info not found for this user') {
       // Redirect to create account page if no account exists
       window.location.href = 'createAccount.html';
@@ -123,6 +124,7 @@ async function loadProfile() {
     document.getElementById('loader').style.display = 'none'; // Hide loader
   }
 }
+
 
 async function addFunds() {
   const user_id = localStorage.getItem('user_id');

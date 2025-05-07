@@ -2,8 +2,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pofile Page</title>
-    <!-- Add Font Awesome CSS -->
+    <title>Profile Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Quicksand:300,400|Lato:400,300|Coda|Open+Sans);
@@ -94,40 +93,36 @@ a {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap; 
-  gap: 1em; /* Optional spacing between items */
 }
 
 .profile-user-page .data-user li {
-  flex: 1 1 30%;
+  width: 33%;
   text-align: center;
-  min-width: 50px;
+  border-left: 0.1em solid transparent;
+}
+
+.profile-user-page .data-user li:first-child {
+  border-left: 0;
 }
 
 .profile-user-page .data-user li a {
   background-color: #f7f7f7;
-  padding: 1em;
+  padding: 0.93em 0;
   color: #46494c;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 40px; /* Force uniform height */
+  display: block;
   border-top: 1px solid rgba(242, 242, 242, 0.5);
   border-bottom: 0.2em solid #f7f7f7;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-              0 1px 1px rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
+    0 1px 1px rgba(255, 255, 255, 0.4);
 }
 
 .profile-user-page .data-user li a strong {
   font-size: 2em;
   font-weight: 600;
-  margin-bottom: 0.2em;
 }
 
 .profile-user-page .data-user li a span {
   color: #717a7e;
-  font-size: 2em;
 }
 
 .profile-user-page .data-user li a:hover {
@@ -460,6 +455,16 @@ footer h4 a {
         </ul>
 
         <ul class="data-user">
+          <li>
+            <p id="balance">
+              <div style="text-align:center; margin-top: 20px;">
+                <input type="number" id="fundAmount" placeholder="Enter amount" style="padding: 10px; width: 200px;" />
+                <button onclick="addFunds()" style="padding: 10px 20px; background-color: #3498db; color: white; border: none; border-radius: 5px;">
+                  Add Funds
+                </button>
+              </div>
+            </p>
+        </li>
             <li>
                 <p id="balance"></p>
             </li>
@@ -495,7 +500,7 @@ footer h4 a {
 
           <!-- New Transaction Section -->
           <div class="transactions-section">
-            <h2>Latest Transactions</h2>
+            
             <div class="transactions-table">
               <table>
                 <thead>
@@ -536,33 +541,7 @@ footer h4 a {
 
     <footer></footer>
     <script src="../userProfileScript.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          loadProfile();
-          
-          // Scroll to top functionality
-          const scrollTopBtn = document.getElementById('scrollTopBtn');
-          
-          window.addEventListener('scroll', function() {
-            const scrollPosition = window.scrollY;
-            const pageHeight = document.documentElement.scrollHeight;
-            const middlePage = pageHeight / 4;
-            
-            if (scrollPosition > middlePage) {
-              scrollTopBtn.style.display = 'flex';
-            } else {
-              scrollTopBtn.style.display = 'none';
-            }
-          });
-          
-          scrollTopBtn.addEventListener('click', function() {
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
-          });
-        });
-      </script>
+    <script src = "js/userProfile.js"> </script>
       
   </body>
 </html>

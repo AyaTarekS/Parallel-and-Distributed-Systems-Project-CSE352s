@@ -62,8 +62,11 @@ function displayProductDetails(product) {
     stockStatus = 'Out of Stock!';
     stockColor = 'red';
   } else if (product.stock_quantity === 1) {
-    stockStatus = 'Only one item is left!';
-    stockColor = '#ffa500'; // yellow/orange
+    stockStatus = 'Only 1 left in stock - order soon';
+    stockColor = '#ffa500';
+  } else if (product.stock_quantity === 2) {
+    stockStatus = 'Only 2 left in stock - order soon';
+    stockColor = '#ffa500';
   } else {
     stockStatus = 'In Stock';
     stockColor = 'green';
@@ -166,7 +169,7 @@ function addToCart(){
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 300);
-  }, 3000);
+  }, 5000); // Changed from 3000 to 5000 for longer display
 }
 
 // Load product on page load

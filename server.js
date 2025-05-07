@@ -85,7 +85,7 @@ const dbConfig3 = {
   port: "41908"
 };
 
-
+let dbConfig;
 
 async function connectDB() {
   try {
@@ -136,7 +136,10 @@ async function connectDB() {
     });
 
 
-// Handle signup
+
+    // Handle signup
+
+    // Handle signup
     app.post("/signup", async (req, res) => {
       const {
         user_id, username, password,
@@ -221,140 +224,16 @@ async function connectDB() {
   }
 });
 
-  app.post('/deposit', async (req, res) => {
-    const { user_id, amount } = req.body;
     
-    try {
-      const db = await mysql.createConnection(dbConfig_central);
-      // Update balance
-      const [result] = await db.execute(
-        `UPDATE account SET balance = balance + ? WHERE person_id = ?`,
-        [amount, user_id]
-      );
-      
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ success: false, message: 'Account not found' });
-      }
-      
-      res.json({ success: true, message: 'Funds added successfully' });
-    } catch (error) {
-      console.error('Error depositing funds:', error);
-      res.status(500).json({ success: false, message: 'Error depositing funds' });
-    }
-  });
 
-  const multer = require('multer');
-  const path = require('path');
-  
-  // Configure file storage
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'public/uploads/');
-    },
-    filename: (req, file, cb) => {
-      cb(null, `profile-${Date.now()}${path.extname(file.originalname)}`);
-    }
-  });
-  
-  const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
-  });
-  
-  app.post('/createAccount', upload.single('profile_picture'), async (req, res) => {
-    console.log('Request Body:', req.body);
-    console.log('Uploaded File:', req.file);
-  
-    try {
-      // Validate required fields
-      const requiredFields = [
-        'person_id', 'bank_name', 'card_num', 
-        'card_type', 'passcode', 'subscription_type',
-        'expiry_month', 'expiry_year'
-      ];
-      
-      const missingFields = requiredFields.filter(field => !req.body[field]);
-      if (missingFields.length > 0) {
-        return res.status(400).json({
-          success: false,
-          message: `Missing required fields: ${missingFields.join(', ')}`
-        });
-      }
-  
-      // Format data
-      const accountData = {
-        account_id: `ACC${Math.floor(100000000000 + Math.random() * 900000000000)}`,
-        person_id: req.body.person_id,
-        bank_name: req.body.bank_name,
-        card_num: req.body.card_num.replace(/\s+/g, ''),
-        card_type: req.body.card_type,
-        passcode: req.body.passcode,
-        subscription_type: req.body.subscription_type,
-        expiry_date: `${req.body.expiry_year}-${req.body.expiry_month.padStart(2, '0')}-01`,
-        profile_picture: req.file ? `/uploads/${req.file.filename}` : null
-      };
-  
-      console.log('Processed Account Data:', accountData);
-  
-      // Database operation
-      const db = await mysql.createConnection(dbConfig_central);
-      
-      try {
-        await db.beginTransaction();
-  
-        // Check if user exists
-        const [user] = await db.execute(
-          'SELECT 1 FROM person_IdentityInfo WHERE person_id = ?', 
-          [accountData.person_id]
-        );
-        
-        if (user.length === 0) {
-          throw new Error('User does not exist');
-        }
-  
-        // Insert account
-        await db.execute(
-          `INSERT INTO account (
-            account_id, person_id, bank_name, card_num, 
-            card_type, passcode, subscription_type, 
-            expiry_date, profile_picture, balance
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00)`,
-          Object.values(accountData)
-        );
-  
-        await db.commit();
-        
-        return res.json({ 
-          success: true, 
-          message: 'Account created successfully',
-          account_id: accountData.account_id
-        });
-  
-      } catch (dbError) {
-        await db.rollback();
-        console.error('Database Error:', dbError);
-        
-        // Handle specific error codes
-        if (dbError.code === 'ER_DUP_ENTRY') {
-          throw new Error('Account already exists for this user');
-        }
-        if (dbError.code === 'ER_NO_REFERENCED_ROW_2') {
-          throw new Error('User does not exist in our system');
-        }
-        throw dbError;
-      } finally {
-        await db.end();
-      }
-  
-    } catch (error) {
-      console.error('Account Creation Error:', error);
-      res.status(500).json({ 
-        success: false, 
-        message: error.message || 'Account creation failed',
-        error: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      });
-    }
-  });
+
+
+
+
+
+
+
+
 
 
 
@@ -444,6 +323,143 @@ async function connectDB2() {
     console.error("Database connection failed:", error);
   }
 
+
+
+  app.post('/deposit', async (req, res) => {
+    const { user_id, amount } = req.body;
+    
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      // Update balance
+      const [result] = await db.execute(
+        `UPDATE account SET balance = balance + ? WHERE person_id = ?`,
+        [amount, user_id]
+      );
+      
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ success: false, message: 'Account not found' });
+      }
+      
+      res.json({ success: true, message: 'Funds added successfully' });
+    } catch (error) {
+      console.error('Error depositing funds:', error);
+      res.status(500).json({ success: false, message: 'Error depositing funds' });
+    }
+  });
+
+    
+  const multer = require('multer');
+const path = require('path');
+
+// Configure file storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `profile-${Date.now()}${path.extname(file.originalname)}`);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
+app.post('/createAccount', upload.single('profile_picture'), async (req, res) => {
+  console.log('Request Body:', req.body);
+  console.log('Uploaded File:', req.file);
+
+  try {
+    // Validate required fields
+    const requiredFields = [
+      'person_id', 'bank_name', 'card_num', 
+      'card_type', 'passcode', 'subscription_type',
+      'expiry_month', 'expiry_year'
+    ];
+    
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missingFields.join(', ')}`
+      });
+    }
+
+    // Format data
+    const accountData = {
+      account_id: `ACC${Math.floor(100000000000 + Math.random() * 900000000000)}`,
+      person_id: req.body.person_id,
+      bank_name: req.body.bank_name,
+      card_num: req.body.card_num.replace(/\s+/g, ''),
+      card_type: req.body.card_type,
+      passcode: req.body.passcode,
+      subscription_type: req.body.subscription_type,
+      expiry_date: `${req.body.expiry_year}-${req.body.expiry_month.padStart(2, '0')}-01`,
+      profile_picture: req.file ? `/uploads/${req.file.filename}` : null
+    };
+
+    console.log('Processed Account Data:', accountData);
+
+    // Database operation
+    const db = await mysql.createConnection(dbConfig_central);
+    
+    try {
+      await db.beginTransaction();
+
+      // Check if user exists
+      const [user] = await db.execute(
+        'SELECT 1 FROM person_IdentityInfo WHERE person_id = ?', 
+        [accountData.person_id]
+      );
+      
+      if (user.length === 0) {
+        throw new Error('User does not exist');
+      }
+
+      // Insert account
+      await db.execute(
+        `INSERT INTO account (
+          account_id, person_id, bank_name, card_num, 
+          card_type, passcode, subscription_type, 
+          expiry_date, profile_picture, balance
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0.00)`,
+        Object.values(accountData)
+      );
+
+      await db.commit();
+      
+      return res.json({ 
+        success: true, 
+        message: 'Account created successfully',
+        account_id: accountData.account_id
+      });
+
+    } catch (dbError) {
+      await db.rollback();
+      console.error('Database Error:', dbError);
+      
+      // Handle specific error codes
+      if (dbError.code === 'ER_DUP_ENTRY') {
+        throw new Error('Account already exists for this user');
+      }
+      if (dbError.code === 'ER_NO_REFERENCED_ROW_2') {
+        throw new Error('User does not exist in our system');
+      }
+      throw dbError;
+    } finally {
+      await db.end();
+    }
+
+  } catch (error) {
+    console.error('Account Creation Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'Account creation failed',
+      error: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
 
 
 
@@ -536,6 +552,7 @@ async function connectDB2() {
           f.name AS item_name,
           f.actual_price,
           i.discount_price,
+          i.tax_rate,
           f.rating AS item_rating,
           s.store_name,
           s.rating AS seller_rating,
@@ -553,13 +570,14 @@ async function connectDB2() {
       `;
   
       const countQuery = `
-        SELECT COUNT(*) as total
-        FROM item_freq f
-        JOIN item_infreq i ON f.item_id = i.item_id
-        JOIN category c ON i.category_id = c.category_id
-        JOIN seller s ON i.seller_id = s.seller_id
-        ${whereClause}
-      `;
+      SELECT COUNT(DISTINCT f.item_id) as total
+      FROM item_freq f
+      JOIN item_infreq i ON f.item_id = i.item_id
+      JOIN category c ON i.category_id = c.category_id
+      JOIN seller s ON i.seller_id = s.seller_id
+      JOIN have h ON f.item_id = h.item_id
+      ${whereClause} AND h.type = 'to_be_sold'
+    `;
   
       const categoryQuery = `
         SELECT DISTINCT c.main_cat_name
@@ -581,6 +599,7 @@ async function connectDB2() {
         category: row.category_name,
         actual_price: parseFloat(row.actual_price),
         discount_price: row.discount_price ? parseFloat(row.discount_price) : null,
+        tax_rate: row.tax_rate ? parseFloat(row.tax_rate) : null,
         item_rating: row.item_rating ? parseFloat(row.item_rating) : null,
         image: row.image,
         stock_quantity: row.stock_quantity,
@@ -607,7 +626,7 @@ async function connectDB2() {
       res.status(500).json({ error: err.message });
     }
   });
-  
+  /*
   app.get('/items/price-range', async (req, res) => {
     try {
       const db = await mysql.createConnection(dbConfig_central);
@@ -636,7 +655,7 @@ async function connectDB2() {
       res.status(500).json({ error: err.message });
     }
   });
-  
+  */
   app.get('/items/related', async (req, res) => {
     try {
       const db = await mysql.createConnection(dbConfig_central);
@@ -687,10 +706,170 @@ async function connectDB2() {
     }
   });
 
+  /////Transactions
+  app.get('/transactions', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {user_id} = req.query;
+
+      const buyerAccountResult = await db.query(
+        `SELECT account_id FROM account WHERE person_id = ?`,
+        [user_id]
+      );
+      //console.log(buyerAccountResult[0][0].account_id)
+      const results = await db.query(
+        `SELECT * FROM railway.transaction where account_id = ?`,
+        [buyerAccountResult[0][0].account_id]
+      );
+      //console.log(results)
+      res.json(results);
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/transactions/byId', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {transactionId} = req.query;
+
+      const transactionResult = await db.query(
+        `SELECT * FROM railway.transaction where transaction_id = ?`,
+        [transactionId]
+      );
+      //console.log(transactionResult[0][0])
+      res.json(transactionResult[0][0]);
+
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  /////buyeraccount
+  app.get('/buyerAccount', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {user_id} = req.query;
+
+      const buyerAccountInfoResult = await db.query(
+        `SELECT * FROM person_IdentityInfo WHERE person_id = ?`,
+        [user_id]
+      );
+      //console.log(buyerAccountInfoResult[0][0])
+      
+      res.json(buyerAccountInfoResult[0][0]);
+
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+  
+
+  /////productsDetails
+  app.get('/productsDetails', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {user_id} = req.query;
+
+      const userCountryResult = await db.query(
+        `SELECT country FROM person_IdentityInfo WHERE person_id = ?`,
+        [user_id]
+      );
+  
+      if (!userCountryResult.length) {
+        console.error('User not found for user_id:', req.user.id);
+        return res.status(404).json({ message: 'User not found' });
+      }
+      let user_country = userCountryResult[0][0].country;
+      //console.log(user_country)
+  
+      if (R1Countries.includes(user_country)) {
+        dbConfig = dbConfig1;
+      } else if (R2Countries.includes(user_country)) {
+        dbConfig = dbConfig2;
+      } else if (R3Countries.includes(user_country)) {
+        dbConfig = dbConfig3;
+      }
+      const db2 = await mysql.createConnection(dbConfig); 
+
+
+      const productsDetailsInfoResult = await db2.query(
+        `SELECT * FROM orders where user_id = ?`,
+        [user_id]
+      );
+      //console.log(productsDetailsInfoResult[0])
+      
+      res.json(productsDetailsInfoResult[0]);
+
+      await db.end();
+      await db2.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  ///ordercontents
+  app.get('/orderContents', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {order_id} = req.query;
+
+      const orderContentsResult = await db.query(
+        `SELECT i.name,	
+		            i.image,
+                c.price_at_purchase,
+                c.quantity,
+                s.store_name  
+		     FROM railway.contains c
+         join railway.item_freq i on i.item_id = c.item_id
+         join railway.item_infreq f on i.item_id = f.item_id
+         join railway.seller s on s.seller_id = f.seller_id
+         where order_id = ?`,
+        [order_id]
+      );
+      res.json(orderContentsResult[0]);
+      
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+  ///paymentInfo
+  app.get('/paymentInfo', async (req, res) => {
+    try {
+      const db2 = await mysql.createConnection(dbConfig); 
+      const {order_id} = req.query;
+
+      const paymentInfoResult = await db2.query(
+        `SELECT * FROM region_3.payment where order_id = ?`,
+        [order_id]
+      );
+      res.json(paymentInfoResult[0]);
+      
+      await db2.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+
+
+  
+
+
   /////
   app.post('/orders/place', async (req, res) => {
     const db = await mysql.createConnection(dbConfig_central);
-    let dbConfig;
+    
     
     const userCountryResult = await db.query(
       `SELECT country FROM person_IdentityInfo WHERE person_id = ?`,
@@ -730,6 +909,7 @@ async function connectDB2() {
       //console.log(buyerAccountId)
 
       let totalAmount = 0;
+      let totalTax = 0;
 
       let tempTotalAmount = 0;
       for (const item of req.body.order){
@@ -765,13 +945,17 @@ async function connectDB2() {
           [item.seller_id]
         );
 
-        if (!sellerAccount.length) {
-          console.error(`Seller account for item ${item.item_id} not found`);
-          return res.status(404).json({ message: `Seller account for item ${item.item_id} not found` });
+        if ( typeof sellerAccount[0][0] === 'undefined' ){
+          console.error(`Seller doesn't have an account (Don't know how actually)`);
+          return res.status(400).json({ message: `Seller doesn't have an account (Don't know how actually)` });
         }
   
         const itemPrice = item.price_at_purchase * item.quantity;
         totalAmount += itemPrice;
+
+        const itemTax = itemPrice * (item.tax_rate / 100 || 0);
+        totalTax += itemTax;
+        console.log(item)
   
         // Deduct stock quantity
         if (product[0].stock_quantity < item.quantity) {
@@ -793,37 +977,70 @@ async function connectDB2() {
   
 
         // Add amount to seller's account
-        if ( typeof sellerAccount[0][0] === 'undefined' ){
-          console.error(`Seller doesn't have an account (Don't know how actually)`);
-          return res.status(400).json({ message: `Seller doesn't have an account (Don't know how actually)` });
-        }
+        
+
+        const sellerAccountID = sellerAccount[0][0].account_id;
 
         await db.query(
           `UPDATE account SET balance = balance + ? WHERE account_id = ?`,
-          [itemPrice, sellerAccount[0][0].account_id]
+          [itemPrice, sellerAccountID]
         );
   
         // Record transaction for seller
         let transactionId = 'TRANS' + Math.floor(Math.random() * 100000);
         await db.query(
           `INSERT INTO transaction (transaction_id, transaction_type, transaction_date, amount, account_id) VALUES (?,?, ?, ?, ?)`,
-          [transactionId, 'Customer Payment recived', new Date(), itemPrice, sellerAccount[0][0].account_id]
+          [transactionId, 'Customer Payment recived', new Date(), itemPrice, sellerAccountID]
         );
   
         // Record transfer of ownership in `transfer` table
         await db.query(
           `INSERT INTO transfer (fromaccountid, toaccountid, Type) VALUES (?, ?, ?)`,
-          [sellerAccount[0][0].account_id, buyerAccountId, 'item']
+          [sellerAccountID, buyerAccountId, 'item']
         );
         await db.query(
           `INSERT INTO transfer (fromaccountid, toaccountid, Type) VALUES (?, ?, ?)`,
-          [buyerAccountId, sellerAccount[0][0].account_id, 'money']
+          [buyerAccountId, sellerAccountID, 'money']
         );
+
+        ///// 'have' table handling
+        const [check_seller] = await db.query(
+          `SELECT * FROM have WHERE item_id = ? AND account_id = ?`,
+          [item.item_id , sellerAccountID]
+        );
+        
+        if (check_seller.length > 0) {
+          await db.query(
+            `UPDATE have SET type = ? WHERE item_id = ? AND account_id = ?`,
+            ['sold' ,item.item_id, sellerAccountID]
+          );
+          //console.log("Item updated.");
+        } else {
+          await db.query(
+            `INSERT INTO have (account_id , item_id , type) VALUES (?, ?, ?)`,
+            [sellerAccountID, item.item_id, 'sold']
+          );
+          //console.log("Item does not exist. Insertion done for seller successfully.");
+        }
+
+        const [check_buyer] = await db.query(
+          `SELECT * FROM have WHERE item_id = ? AND account_id = ?`,
+          [item.item_id , buyerAccountId]
+        );
+        
+        if (!(check_buyer.length > 0)) {
+          await db.query(
+            `INSERT INTO have (account_id , item_id , type) VALUES (?, ?, ?)`,
+            [buyerAccountId, item.item_id, 'purchased']
+          );
+          //console.log("Insertion done for buyer successfully");
+        }
+
       }
 
       const orderTime = new Date();
       const shippingLocation = user_country; // Assuming shipping location is the user's country
-      const status = 'pending'; // Default status for a new order
+      const orderstatus = 'pending'; // Default status for a new order
       const trackingNumber = Math.floor(10000 + Math.random() * 90000).toString(); // Generate a random tracking number
       const deliveryMethod = 'Road Freight'; // Default delivery method
       const packageType = 'box'; // Default package type
@@ -833,11 +1050,27 @@ async function connectDB2() {
       const newOrderResult = await db2.query(
         `INSERT INTO orders (user_id, total_amount, shipping_location, order_time, status, tracking_number, delivery_method, package_type, order_priority, expected_delivery_time) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [req.body.userId, totalAmount, shippingLocation, orderTime, status, trackingNumber, deliveryMethod, packageType, orderPriority, expectedDeliveryTime]
+        [req.body.userId, totalAmount, shippingLocation, orderTime, orderstatus, trackingNumber, deliveryMethod, packageType, orderPriority, expectedDeliveryTime]
       );
+
       const newOrderId = newOrderResult[0].insertId;
-      //console.log(newOrderId)
+
+      //// add payment
       
+      const paymentMethods = ["Bank_Transfer", "Paypal", "Credit_Card", "Cash"];
+      const paymentMethod = paymentMethods[Math.floor(Math.random() * paymentMethods.length)];
+      const paymentstatus = 'completed';
+      
+      const newPaymentResult = await db2.query(
+        `INSERT INTO payment (user_id, order_id, amount_without_taxes, status, payment_date, method, tax_amount) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [req.body.userId, newOrderId, totalAmount, paymentstatus, new Date(), paymentMethod, totalTax]
+      );
+
+      const newPaymentId = newPaymentResult[0].insertId;
+      
+      
+
       // Deduct total amount from buyer's account
       const buyerAccount = await db.query(`SELECT * FROM account WHERE account_id = ?`, [buyerAccountId]);
       if (buyerAccount[0].balance < totalAmount) {
@@ -856,7 +1089,7 @@ async function connectDB2() {
         [transactionId,'Invoice', new Date(), totalAmount, buyerAccountId]
       );
 
-      // Record order in `contains` table
+      // Record order in `contains` table--
 
       await db.query(
         `INSERT INTO contains (order_id, item_id, quantity, price_at_purchase) VALUES ?`,
@@ -864,7 +1097,7 @@ async function connectDB2() {
       );
   
       res.status(200).json({ message: 'Order placed successfully' });
-     
+      await db.end();
     } catch (error) {
       console.error('Error in placeOrder:', error); // Log the error for debugging
       res.status(500).json({ message: 'Internal server error', error: error.message });
@@ -898,9 +1131,166 @@ async function connectDB2() {
     }
   });
   
+  app.post('/items/create', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const { 
+        itemName, 
+        imageUrl, 
+        price, 
+        discount, 
+        stockQuantity,
+        warranty,
+        category,
+        taxRate,
+        sellerId 
+      } = req.body;
+
+      // Validate numeric inputs
+      const actualPrice = Math.max(0, parseFloat(price));
+      const validatedTaxRate = taxRate ? Math.max(0, Math.min(100, parseFloat(taxRate))) : 0;
+      const validatedDiscount = discount ? Math.max(0, Math.min(100, parseFloat(discount))) : 0;
+      const discountPrice = validatedDiscount > 0 ? 
+        parseFloat((actualPrice * (1 - validatedDiscount/100)).toFixed(2)) : null;
+      const validatedWarranty = warranty ? parseInt(warranty) : 0;
+
+      // Get category_id using sub_cat_name
+      const [categoryResult] = await db.query(
+        'SELECT category_id FROM category WHERE sub_cat_name = ?',
+        [category]
+      );
+
+      if (!categoryResult.length) {
+        return res.status(400).json({ 
+          message: 'Invalid category',
+          error: 'INVALID_CATEGORY'
+        });
+      }
+
+      const categoryId = categoryResult[0].category_id;
+
+      // Insert into item_freq with transaction
+      let result
+      await db.beginTransaction();
+      try {
+         result = await db.query(
+          `INSERT INTO item_freq (stock_quantity, actual_price, name, image, rating, num_ratings)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [stockQuantity, actualPrice, itemName, imageUrl, 0, 0]
+        )
+        console.log(result)
+        const insertedItemId = result[0].insertId;
+
+      // Insert into item_infreq with all fields explicitly specified
+      await db.query(
+        `INSERT INTO item_infreq (item_id, is_best_seller, tax_rate, warranty_period, link, discount_price, category_id, seller_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          insertedItemId,
+          0, 
+          validatedTaxRate || 0,
+          validatedWarranty,
+          null, 
+          discountPrice,
+          categoryId,
+          sellerId
+        ]
+      );
+
+        
+
+        const [sellerAccount] = await db.query(
+          'SELECT account_id FROM account WHERE person_id = ?',
+          [sellerId]
+        );
+
+        await db.query(
+          `INSERT INTO have (account_id, item_id, type)
+           VALUES (?, ?, ?)`,
+          [sellerAccount[0].account_id, insertedItemId, 'to_be_sold']
+        );
+
+        await db.commit();
+        res.json({ 
+          message: 'Listing created successfully',
+          itemId: insertedItemId 
+        });
+      } catch (err) {
+        await db.rollback();
+        throw err;
+      }
+
+    } catch (error) {
+      console.error('Error creating listing:', error);
+      res.status(500).json({ 
+        message: 'Failed to create listing',
+        error: error.message 
+      });
+    }
+  });
+
+  // Helper function to get next available item_id
+  async function getNextItemId(db) {
+    const [maxIdResult] = await db.query('SELECT MAX(item_id) as maxId FROM item_freq');
+    return (maxIdResult[0].maxId || 0) + 1;
+  }
+  
+  app.get('/categories/list', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const [categories] = await db.query(
+        'SELECT sub_cat_name FROM category ORDER BY sub_cat_name'
+      );
+      res.json(categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      res.status(500).json({ message: 'Failed to fetch categories' });
+    }
+  });
+
+
+
+
+  app.get('/reports/top-sellers', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const [results] = await db.execute(`
+        SELECT s.seller_id, s.store_name, s.business_email, SUM(sp.amount) AS total_earnings
+        FROM seller_payout sp
+        JOIN seller s ON s.seller_id = sp.seller_id
+        GROUP BY sp.seller_id
+        ORDER BY total_earnings DESC
+        LIMIT 10;
+      `);
+      res.json(results);
+    } catch (error) {
+      console.error('Query error:', error);
+      res.status(500).json({ error: 'Database query failed' });
+    }
+  });
+
+  app.get('/reports/most-reviewed', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const [results] = await db.execute(`
+        SELECT i.name, COUNT(r.item_id) AS review_count
+        FROM item_freq i
+        JOIN regular_reviews r ON i.item_id = r.item_id
+        GROUP BY i.item_id
+        HAVING review_count >= 25
+        ORDER BY review_count DESC;
+      `);
+      res.json(results);
+    } catch (err) {
+      console.error('Query error:', err);
+      res.status(500).json({ error: 'Database error' });
+    }
+  });
+  
+
+
+
 }
-
-
 
 async function startServer() {
   try {
