@@ -862,6 +862,163 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
   });
 
 
+//Manage Listings
+
+app.get('/items/list', async (req, res) => {
+  try {
+    const db = await mysql.createConnection(dbConfig_central);
+    const sellerId = req.query.seller_id;
+
+    const [items] = await db.query(`
+      SELECT 
+        i.item_id, i.name, i.image, i.actual_price, i.stock_quantity,
+        ii.tax_rate, ii.warranty_period, ii.discount_price,
+        c.sub_cat_name AS category
+      FROM item_freq i
+      JOIN item_infreq ii ON i.item_id = ii.item_id
+      JOIN category c ON ii.category_id = c.category_id
+      JOIN account a ON a.account_id = (SELECT account_id FROM account WHERE person_id = ? LIMIT 1)
+      JOIN have h ON h.item_id = i.item_id AND h.account_id = a.account_id
+      WHERE h.type = 'to_be_sold'
+    `, [sellerId]);
+
+    res.json(items);
+  } catch (err) {
+    console.error('Error fetching seller items:', err);
+    res.status(500).json({ message: 'Failed to fetch items' });
+  }
+});
+
+
+app.put('/items/update/:itemId', async (req, res) => {
+  try {
+    const db = await mysql.createConnection(dbConfig_central);
+    const itemId = parseInt(req.params.itemId);
+    const {
+      itemName,
+      imageUrl,
+      price,
+      discount,
+      stockQuantity,
+      warranty,
+      taxRate,
+      category
+    } = req.body;
+
+    // Get category_id if category name is updated
+    let categoryId = null;
+    if (category) {
+      const [categoryResult] = await db.query(
+        'SELECT category_id FROM category WHERE sub_cat_name = ?',
+        [category]
+      );
+      if (!categoryResult.length) {
+        return res.status(400).json({ message: 'Invalid category' });
+      }
+      categoryId = categoryResult[0].category_id;
+    }
+
+    // Prepare values
+    const actualPrice = price !== undefined ? parseFloat(price) : null;
+    const validatedDiscount = discount !== undefined ? Math.min(100, Math.max(0, parseFloat(discount))) : null;
+    const discountPrice = validatedDiscount !== null && actualPrice !== null
+      ? parseFloat((actualPrice * (1 - validatedDiscount / 100)).toFixed(2))
+      : null;
+
+    const validatedTaxRate = taxRate !== undefined ? Math.min(100, Math.max(0, parseFloat(taxRate))) : null;
+    const validatedWarranty = warranty !== undefined ? parseInt(warranty) : null;
+
+    await db.beginTransaction();
+
+    // Update item_freq
+    const itemFreqQuery = `
+      UPDATE item_freq
+      SET ${itemName ? 'name = ?,' : ''} 
+          ${imageUrl ? 'image = ?,' : ''} 
+          ${price !== undefined ? 'actual_price = ?,' : ''} 
+          ${stockQuantity !== undefined ? 'stock_quantity = ?,' : ''}
+          name = name -- dummy to end trailing comma
+      WHERE item_id = ?
+    `;
+    const itemFreqValues = [
+      ...(itemName ? [itemName] : []),
+      ...(imageUrl ? [imageUrl] : []),
+      ...(price !== undefined ? [actualPrice] : []),
+      ...(stockQuantity !== undefined ? [stockQuantity] : []),
+      itemId
+    ];
+    await db.query(itemFreqQuery, itemFreqValues);
+
+    // Update item_infreq
+    const itemInfreqQuery = `
+      UPDATE item_infreq
+      SET 
+        ${taxRate !== undefined ? 'tax_rate = ?,' : ''}
+        ${warranty !== undefined ? 'warranty_period = ?,' : ''}
+        ${discountPrice !== null ? 'discount_price = ?,' : ''}
+        ${categoryId !== null ? 'category_id = ?,' : ''}
+        item_id = item_id
+      WHERE item_id = ?
+    `;
+    const itemInfreqValues = [
+      ...(taxRate !== undefined ? [validatedTaxRate] : []),
+      ...(warranty !== undefined ? [validatedWarranty] : []),
+      ...(discountPrice !== null ? [discountPrice] : []),
+      ...(categoryId !== null ? [categoryId] : []),
+      itemId
+    ];
+    await db.query(itemInfreqQuery, itemInfreqValues);
+
+    await db.commit();
+    res.json({ message: 'Item updated successfully' });
+
+  } catch (error) {
+    if (db?.rollback) await db.rollback();
+    console.error('Error updating item:', error);
+    res.status(500).json({ message: 'Failed to update item', error: error.message });
+  }
+});
+
+
+app.delete('/items/delete/:itemId', async (req, res) => {
+  try {
+    const db = await mysql.createConnection(dbConfig_central);
+    const itemId = parseInt(req.params.itemId);
+
+    await db.beginTransaction();
+
+    // Delete from 'have'
+    await db.query('DELETE FROM have WHERE item_id = ?', [itemId]);
+
+    // Delete from 'item_infreq'
+    await db.query('DELETE FROM item_infreq WHERE item_id = ?', [itemId]);
+
+    // Delete from 'item_freq'
+    await db.query('DELETE FROM item_freq WHERE item_id = ?', [itemId]);
+
+    await db.commit();
+    res.json({ message: 'Item deleted successfully' });
+  } catch (error) {
+    if (db?.rollback) await db.rollback();
+    console.error('Error deleting item:', error);
+    res.status(500).json({ message: 'Failed to delete item', error: error.message });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
 
@@ -1131,6 +1288,8 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
     }
   });
   
+
+
   app.post('/items/create', async (req, res) => {
     try {
       const db = await mysql.createConnection(dbConfig_central);
@@ -1228,6 +1387,12 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
       });
     }
   });
+
+  
+  
+
+
+
 
   // Helper function to get next available item_id
   async function getNextItemId(db) {
