@@ -626,36 +626,6 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
       res.status(500).json({ error: err.message });
     }
   });
-  /*
-  app.get('/items/price-range', async (req, res) => {
-    try {
-      const db = await mysql.createConnection(dbConfig_central);
-      const { category } = req.query;
-  
-      let query = `
-        SELECT 
-          MIN(IFNULL(i.discount_price, f.actual_price)) as min_price,
-          MAX(IFNULL(i.discount_price, f.actual_price)) as max_price
-        FROM item_freq f
-        JOIN item_infreq i ON f.item_id = i.item_id
-        JOIN category c ON i.category_id = c.category_id
-      `;
-  
-      const params = [];
-      if (category) {
-        query += ` WHERE LOWER(c.main_cat_name) LIKE ?`;
-        params.push(`%${category.toLowerCase()}%`);
-      }
-  
-      const [results] = await db.query(query, params);
-      res.json(results[0]);
-      await db.end();
-    } catch (err) {
-      console.error("❌ Price range query error:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-  */
   app.get('/items/related', async (req, res) => {
     try {
       const db = await mysql.createConnection(dbConfig_central);
@@ -686,7 +656,7 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
       res.status(500).json({ error: err.message });
     }
   });
-  
+
   app.get('/user/balance', async (req, res) => {
     try {
       const db = await mysql.createConnection(dbConfig_central);
@@ -718,7 +688,7 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
       );
       //console.log(buyerAccountResult[0][0].account_id)
       const results = await db.query(
-        `SELECT * FROM railway.transaction where account_id = ?`,
+        `SELECT * FROM transaction where account_id = ? AND transaction_type = 'Invoice'`,
         [buyerAccountResult[0][0].account_id]
       );
       //console.log(results)
@@ -736,7 +706,7 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
       const {transactionId} = req.query;
 
       const transactionResult = await db.query(
-        `SELECT * FROM railway.transaction where transaction_id = ?`,
+        `SELECT * FROM transaction where transaction_id = ?`,
         [transactionId]
       );
       //console.log(transactionResult[0][0])
@@ -762,6 +732,26 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
       //console.log(buyerAccountInfoResult[0][0])
       
       res.json(buyerAccountInfoResult[0][0]);
+
+      await db.end();
+    } catch (err) {
+      console.error("❌ Related products query error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+  /////selleraccount
+  app.get('/selleraccount', async (req, res) => {
+    try {
+      const db = await mysql.createConnection(dbConfig_central);
+      const {user_id} = req.query;
+
+      const sellerAccountInfoResult = await db.query(
+        `SELECT store_name FROM railway.seller where seller_id = ?`,
+        [user_id]
+      );
+      //console.log(buyerAccountInfoResult[0][0])
+      
+      res.json(sellerAccountInfoResult[0][0].store_name);
 
       await db.end();
     } catch (err) {
@@ -827,10 +817,10 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
                 c.price_at_purchase,
                 c.quantity,
                 s.store_name  
-		     FROM railway.contains c
-         join railway.item_freq i on i.item_id = c.item_id
-         join railway.item_infreq f on i.item_id = f.item_id
-         join railway.seller s on s.seller_id = f.seller_id
+		     FROM contains c
+         join item_freq i on i.item_id = c.item_id
+         join item_infreq f on i.item_id = f.item_id
+         join seller s on s.seller_id = f.seller_id
          where order_id = ?`,
         [order_id]
       );
@@ -849,7 +839,7 @@ app.post('/createAccount', upload.single('profile_picture'), async (req, res) =>
       const {order_id} = req.query;
 
       const paymentInfoResult = await db2.query(
-        `SELECT * FROM region_3.payment where order_id = ?`,
+        `SELECT * FROM payment where order_id = ?`,
         [order_id]
       );
       res.json(paymentInfoResult[0]);
@@ -1006,27 +996,9 @@ app.delete('/items/delete/:itemId', async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
   /////
   app.post('/orders/place', async (req, res) => {
     const db = await mysql.createConnection(dbConfig_central);
-    
     
     const userCountryResult = await db.query(
       `SELECT country FROM person_IdentityInfo WHERE person_id = ?`,
@@ -1112,7 +1084,7 @@ app.delete('/items/delete/:itemId', async (req, res) => {
 
         const itemTax = itemPrice * (item.tax_rate / 100 || 0);
         totalTax += itemTax;
-        console.log(item)
+        //console.log(item)
   
         // Deduct stock quantity
         if (product[0].stock_quantity < item.quantity) {
@@ -1337,7 +1309,7 @@ app.delete('/items/delete/:itemId', async (req, res) => {
            VALUES (?, ?, ?, ?, ?, ?)`,
           [stockQuantity, actualPrice, itemName, imageUrl, 0, 0]
         )
-        console.log(result)
+        //console.log(result)
         const insertedItemId = result[0].insertId;
 
       // Insert into item_infreq with all fields explicitly specified
