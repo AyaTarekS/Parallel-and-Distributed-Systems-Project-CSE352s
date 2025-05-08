@@ -62,8 +62,11 @@ function displayProductDetails(product) {
     stockStatus = 'Out of Stock!';
     stockColor = 'red';
   } else if (product.stock_quantity === 1) {
-    stockStatus = 'Only one item is left!';
-    stockColor = '#ffa500'; // yellow/orange
+    stockStatus = 'Only 1 left in stock - order soon';
+    stockColor = '#ffa500';
+  } else if (product.stock_quantity === 2) {
+    stockStatus = 'Only 2 left in stock - order soon';
+    stockColor = '#ffa500';
   } else {
     stockStatus = 'In Stock';
     stockColor = 'green';
@@ -153,27 +156,55 @@ function addToCart(){
   }
   localStorage.setItem('cart',JSON.stringify(cart));
   
-  // Show notification
+  
   const notification = document.createElement('div');
   notification.className = 'notification';
   notification.textContent = 'Item added to cart successfully!';
   document.body.appendChild(notification);
-  
-  // Trigger the animation
   setTimeout(() => notification.classList.add('show'), 10);
-  
-  // Remove the notification after 3 seconds
   setTimeout(() => {
     notification.classList.remove('show');
     setTimeout(() => notification.remove(), 300);
-  }, 3000);
+  }, 5000); 
 }
 
-// Load product on page load
-//document.addEventListener('DOMContentLoaded', fetchProductDetails);
+function disableAddToCartButton(condition, errorMessage = '') {
+  const addToCartButton = document.querySelector('.btn');
+  let errorElement = document.querySelector('.error-message');
+
+  if (!errorElement) {
+    errorElement = document.createElement('span');
+    errorElement.className = 'error-message';
+    errorElement.style.color = 'red';
+    errorElement.style.marginLeft = '10px';
+    errorElement.style.fontSize = '0.9em';
+    addToCartButton.parentNode.insertBefore(errorElement, addToCartButton.nextSibling);
+  }
+
+  if (condition) {
+    addToCartButton.disabled = true;
+    addToCartButton.style.opacity = '0.5';
+    addToCartButton.style.cursor = 'not-allowed';
+    errorElement.textContent = errorMessage;
+    errorElement.style.display = 'inline';
+  } else {
+    addToCartButton.disabled = false;
+    addToCartButton.style.opacity = '1';
+    addToCartButton.style.cursor = 'pointer';
+    errorElement.textContent = '';
+    errorElement.style.display = 'none';
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
-    await fetchProductDetails();
-    document.querySelector('.btn').addEventListener('click', function (e) {
+  await fetchProductDetails();
+  const userId = localStorage.getItem('user_id');
+  const response = await fetch(`http://localhost:3000/selleraccount/?user_id=${userId}`);
+  const seller_name = await response.json();
+  disableAddToCartButton(seller_name == product.seller.store_name , "You can't buy your own items");
+
+  document.querySelector('.btn').addEventListener('click', function (e) {
     e.preventDefault();
     addToCart();
   });

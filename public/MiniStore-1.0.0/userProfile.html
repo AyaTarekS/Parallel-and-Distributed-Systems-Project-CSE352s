@@ -2,11 +2,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pofile Page</title>
-    <!-- Add Font Awesome CSS -->
+    <title>Profile Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <style>
       @import url(https://fonts.googleapis.com/css?family=Quicksand:300,400|Lato:400,300|Coda|Open+Sans);
+      
 
 body {
   background: #f8f5f0;
@@ -51,8 +52,8 @@ a {
 .profile-user-page .img-user-profile .avatar {
   margin: 0 auto;
   background: #fff;
-  width: 10em;
-  height: 10em;
+  width: 12em;
+  height: 12em;
   padding: 0.25em;
   border-radius: 50%;
   margin-top: -3.5em; 
@@ -88,52 +89,52 @@ a {
 
 .profile-user-page .data-user {
   font-family: "Quicksand", sans-serif;
-  margin-top: 1.5em; 
+  margin-top: 2em; 
   padding: 0;
   list-style: none;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap; 
-  gap: 1em; /* Optional spacing between items */
 }
 
 .profile-user-page .data-user li {
-  flex: 1 1 30%;
+  width: 33%;
   text-align: center;
-  min-width: 50px;
+  border-left: 0.1em solid transparent;
+}
+
+.profile-user-page .data-user li:first-child {
+  border-left: 0;
+  
 }
 
 .profile-user-page .data-user li a {
   background-color: #f7f7f7;
-  padding: 1em;
+  padding: 0.93em 0;
   color: #46494c;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 40px; /* Force uniform height */
+  display: block;
   border-top: 1px solid rgba(242, 242, 242, 0.5);
   border-bottom: 0.2em solid #f7f7f7;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
-              0 1px 1px rgba(255, 255, 255, 0.4);
-  transition: all 0.3s ease;
+    0 1px 1px rgba(255, 255, 255, 0.4);
 }
 
 .profile-user-page .data-user li a strong {
-  font-size: 2em;
+  font-size: 1.2em;
   font-weight: 600;
-  margin-bottom: 0.2em;
 }
-
+.profile-user-page .data-user li a {
+  font-size: 1.2em;
+  font-weight: 600;
+}
 .profile-user-page .data-user li a span {
   color: #717a7e;
-  font-size: 2em;
 }
 
 .profile-user-page .data-user li a:hover {
   background: rgba(0, 0, 0, 0.05);
-  border-bottom: 0.2em solid #3498db;
-  color: #3498db;
+  border-bottom: 0.2em solid #11781f;
+  color: #1d9032;
 }
 
 footer h4 {
@@ -411,6 +412,19 @@ footer h4 a {
 .scroll-to-top:hover i {
   animation: bounce 1s infinite;
 }
+.add-funds-btn {
+  padding: 10px 20px;
+  background-color: #18840e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-funds-btn:hover {
+  background-color: #145c0b; /* Darker green on hover */
+}
     </style>
   </head>
   <body>
@@ -449,31 +463,39 @@ footer h4 a {
         <div class="description-profile"><p id="description">-</p></div>
         <ul class="data-user">
           <li>
-            <a><strong id="items_number">-</strong></a>
+            <a><i class="fas fa-boxes fa-2x"></i><strong id="items_number">-</strong></a>
           </li>
           <li>
-            <a><strong id="avgDays">-</strong></a>
+            <a><i class="fas fa-calendar-day fa-2x"></i><strong id="avgDays">-</strong></a>
           </li>
           <li>
-            <a><strong id="country">-</strong></a>
+            <a><i class="fas fa-map-marker-alt fa-2x"></i> <strong id="country">-</strong></a>
           </li>
+          <li>
+            <a><i class="fas fa-credit-card fa-2x"></i><strong id="cardType">-</strong></a>
+          </li>
+          <li>
+            <a><i class="fas fa-wallet fa-2x"></i> <strong id="balance">-</strong></a>
+          </li>
+          <li>
+            <a><i class="fas fa-university fa-2x"></i><strong id="bankName">-</strong></a>
+          </li>
+
         </ul>
 
         <ul class="data-user">
-            <li>
-                <p id="balance"></p>
-            </li>
-            <li>
-                <p id="bankName"></p>
-            </li>
-            <li>
-                <p id="cardType"></p>
-            </li>
-            <li>
-                <p id="subscriptionType"></p>
-            </li>
-            <li>
-              <p ></p>
+          <li>
+            <p id="balance">
+              <div style="text-align:center; margin-top: 20px;">
+                <input type="number" id="fundAmount" placeholder="Enter amount" style="padding: 10px; width: 200px;" />
+                <button onclick="addFunds()" class="add-funds-btn">
+                  Add Funds
+                </button>
+              </div>
+            </p>
+ 
+              
+
           </li>
           </ul>
 
@@ -495,7 +517,7 @@ footer h4 a {
 
           <!-- New Transaction Section -->
           <div class="transactions-section">
-            <h2>Latest Transactions</h2>
+            
             <div class="transactions-table">
               <table>
                 <thead>
@@ -536,33 +558,7 @@ footer h4 a {
 
     <footer></footer>
     <script src="../userProfileScript.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-          loadProfile();
-          
-          // Scroll to top functionality
-          const scrollTopBtn = document.getElementById('scrollTopBtn');
-          
-          window.addEventListener('scroll', function() {
-            const scrollPosition = window.scrollY;
-            const pageHeight = document.documentElement.scrollHeight;
-            const middlePage = pageHeight / 4;
-            
-            if (scrollPosition > middlePage) {
-              scrollTopBtn.style.display = 'flex';
-            } else {
-              scrollTopBtn.style.display = 'none';
-            }
-          });
-          
-          scrollTopBtn.addEventListener('click', function() {
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
-          });
-        });
-      </script>
+    <script src = "js/userProfile.js"> </script>
       
   </body>
 </html>

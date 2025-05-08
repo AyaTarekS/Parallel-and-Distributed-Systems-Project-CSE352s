@@ -151,9 +151,46 @@
             vertical-align: middle;
             margin-right: 8px;
         }
+
+        /* Loader styles */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader div {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Loader element -->
+    <div class="loader" id="loader">
+        <div></div>
+    </div>
+    
     <div class="transaction-container">
         <div class="section">
             <div class="header-section">
@@ -167,7 +204,7 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Transaction ID</div>
-                    <div class="info-value">#TRX-789456</div>
+                    <div class="info-value info-transaction-id">#TRX-789456</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Status</div>
@@ -177,11 +214,11 @@
                 </div>
                 <div class="info-item">
                     <div class="info-label">Date & Time</div>
-                    <div class="info-value">March 20, 2024, 15:30:45</div>
+                    <div class="info-value info-date">March 20, 2024, 15:30:45</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Reference Number</div>
-                    <div class="info-value">REF-456789</div>
+                    <div class="info-label">Amount</div>
+                    <div class="info-value info-amount">REF-456789</div>
                 </div>
             </div>
         </div>
@@ -191,41 +228,22 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Name</div>
-                    <div class="info-value">John Doe</div>
+                    <div class="info-value info-name">John Doe</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Email</div>
-                    <div class="info-value">john.doe@example.com</div>
+                    <div class="info-label">minit</div>
+                    <div class="info-value info-minit">john.doe@example.com</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Phone</div>
-                    <div class="info-value">+1 234-567-8900</div>
+                    <div class="info-value info-phone">+1 234-567-8900</div>
                 </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="section-title">Product Details</div>
-            <div class="product-info">
-                <img src="images/product-item1.jpg" alt="Product" class="product-image">
-                <div>
-                    <h3>Premium Headphones</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Unit Price</div>
-                            <div class="info-value">$249.99</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Quantity</div>
-                            <div class="info-value">1</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Seller</div>
-                            <div class="info-value">Electronics Pro Shop</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="section-product">Product Details</div>
+    
         </div>
 
         <div class="section">
@@ -233,32 +251,32 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Payment Method</div>
-                    <div class="info-value">
+                    <div class="info-value info-Method">
                         <img src="images/visa.svg" alt="Visa" class="payment-logo">
-                        ending in 4589
+
                     </div>
                 </div>
                 <div class="info-item">
-                    <div class="info-label">Payment Provider</div>
-                    <div class="info-value">Stripe Payments</div>
+                    <div class="info-label">Payment date</div>
+                    <div class="info-value info-payment-date">Stripe Payments</div>
                 </div>
             </div>
             <div class="price-details">
                 <div class="price-row">
-                    <span>Subtotal:</span>
-                    <span>$249.99</span>
+                    <span >Subtotal:</span>
+                    <span class = "sub-total">$249.99</span>
                 </div>
                 <div class="price-row">
                     <span>Shipping:</span>
-                    <span>$4.99</span>
+                    <span class = "Shipping">$4.99</span>
                 </div>
                 <div class="price-row">
-                    <span>Tax (10%):</span>
-                    <span>$25.50</span>
+                    <span class = "Tax-percent">Tax (10%):</span>
+                    <span class = "Tax">$25.50</span>
                 </div>
                 <div class="price-row price-total">
                     <span>Total:</span>
-                    <span>$299.99</span>
+                    <span class = "total">$299.99</span>
                 </div>
             </div>
         </div>
@@ -268,28 +286,17 @@
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-label">Street Address</div>
-                    <div class="info-value">123 Sample Street</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">City</div>
-                    <div class="info-value">New York</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">State</div>
-                    <div class="info-value">NY</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">ZIP Code</div>
-                    <div class="info-value">10001</div>
+                    <div class="info-value info-address">123 Sample Street</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">Country</div>
-                    <div class="info-value">United States</div>
+                    <div class="info-value info-country">United States</div>
                 </div>
             </div>
         </div>
 
         <a href="userProfile.html" class="back-btn">Back to Profile</a>
     </div>
+    <script src="js/transactionDetails.js"></script>
 </body>
 </html>

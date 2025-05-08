@@ -13,7 +13,8 @@ async function loadProfile() {
   try {
     const response = await fetch(`/profileInfo?user_id=${user_id}`);
     const profile = await response.json();
-    
+    console.log("Profile:", profile);
+
     if (profile.message === 'Account info not found for this user') {
       // Redirect to create account page if no account exists
       window.location.href = 'createAccount.html';
@@ -35,11 +36,11 @@ async function loadProfile() {
       }
       var bal = document.querySelector('#balance');
       if (bal) {
-        bal.textContent = `Balance: $${profile.balance}`;
+        bal.textContent = `  $${profile.balance}`;
       }
       var bank = document.querySelector('#bankName');
       if (bank) {
-        bank.textContent = `Bank: ${profile.bank_name}`;
+        bank.textContent = ` ${profile.bank_name}`;
       }
       var subscription = document.querySelector('#subscriptionType');
       if (subscription) {
@@ -47,23 +48,26 @@ async function loadProfile() {
       }
       var card = document.querySelector('#cardType');
       if (card) {
-        card.textContent = `Card Type: ${profile.card_type}`;
+        card.textContent = ` ${profile.card_type}`;
       }
       var item_num = document.querySelector('#items_number');
       if (item_num) {
-        item_num.textContent = `${profile.item_count} items`;
+        item_num.textContent = ` ${profile.item_count} items`;
       }
       var desc=document.querySelector('#description');
       if(desc){
-        desc.textContent=`${profile.address}`;
+        desc.textContent = profile.address ? profile.address : "New Thunder Seller";
+
       }
-      var avg_days=document.querySelector('#avgDays');
-      if(avg_days){
-        avg_days.textContent=`Average ${profile.average_days_between_purchases} Days Between Purchases`
-      }
+      var avg_days = document.querySelector('#avgDays');
+if (avg_days) {
+  const avg = profile.average_days_between_purchases ?? 0;
+  avg_days.textContent = ` ${avg} Days Between Purchases`;
+}
+
       var coun=document.querySelector('#country');
       if(coun){
-        coun.textContent=`From ${profile.country}`
+        coun.textContent=`${profile.country}`
       }
 
 
@@ -123,6 +127,7 @@ async function loadProfile() {
     document.getElementById('loader').style.display = 'none'; // Hide loader
   }
 }
+
 
 async function addFunds() {
   const user_id = localStorage.getItem('user_id');
