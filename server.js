@@ -184,7 +184,12 @@ async function connectDB() {
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [user_id, fname, minit || null, lname, phone_num || null, null, country]
     );
-
+    await centralDb.execute(
+      `INSERT INTO seller (seller_id, store_name, business_email, verification_level, joined_date)
+       VALUES (?, ?, ?, ?, ?)`,
+      [user_id, fname, `${fname}@thunder.com`, "basic", new Date()]
+    );
+    
     await centralDb.execute(
       `INSERT INTO person_ProfileInfo (person_id, gender, date_birth)
        VALUES (?, ?, ?)`,
@@ -225,18 +230,6 @@ async function connectDB() {
 });
 
     
-
-
-
-
-
-
-
-
-
-
-
-
   } catch (error) {
     console.error("Database connection failed:", error);
   }
